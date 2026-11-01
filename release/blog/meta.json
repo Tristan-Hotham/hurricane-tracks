@@ -1,0 +1,18 @@
+{
+  "title": "Every storm since 1851: where hurricanes form, where they hit, and are they getting stronger?",
+  "slug": "hurricane-tracks",
+  "excerpt": "I mapped all 13,186 tropical cyclones in NOAA's global archive, from depressions to Category 5 typhoons. The number of storms has not changed since 1980, but more of them reach Category 4 or 5 and they peak further from the equator. Before satellites, the record misses too many storms to say much more.",
+  "seo_description": "Every hurricane, typhoon and cyclone since 1851 on one map: where they form, where they hit, and whether they are getting stronger.",
+  "tags": [
+    "hurricanes",
+    "typhoons",
+    "tropical cyclones",
+    "climate",
+    "maps",
+    "data visualisation",
+    "IBTrACS",
+    "NOAA",
+    "open data"
+  ],
+  "header_alt": "Title card reading 'Every storm since 1851' in black on pale paper, beside a Pacific-centred world map of thousands of storm tracks coloured from blue to deep red and plum by strength, densest east of the Philippines. Text: 13,186 tropical cyclones, by strength; Category 4+ share 12% in the 1980s, 23% in the 2010s."
+}
