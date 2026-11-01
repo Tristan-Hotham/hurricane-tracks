@@ -1,0 +1,449 @@
+iso,country,region,ts,hu,mj,c5
+CHN,China,Guangdong,118,47,7,0
+AUS,Australia,Western Australia,96,37,19,0
+CHN,China,Fujian,65,26,2,0
+AUS,Australia,Queensland,61,15,5,0
+USA,United States,Florida,58,21,10,0
+JPN,Japan,Okinawa Prefecture,55,35,16,0
+CHN,China,Hainan,49,21,2,0
+PHL,Philippines,Cagayan,47,28,15,1
+JPN,Japan,Kagoshima Prefecture,39,24,4,0
+AUS,Australia,Northern Territory,39,13,4,1
+PHL,Philippines,Aurora,34,21,12,0
+MEX,Mexico,Baja California Sur,34,15,2,0
+PHL,Philippines,Quezon,33,21,9,1
+CHN,China,Zhejiang,33,12,2,0
+USA,United States,Louisiana,31,16,4,0
+USA,United States,Texas,29,15,3,0
+IND,India,Andhra Pradesh,29,7,5,0
+PHL,Philippines,Eastern Samar,28,11,4,0
+PHL,Philippines,Palawan,28,6,1,0
+TWN,Taiwan,Taitung,27,22,8,0
+PHL,Philippines,Isabela,27,18,10,1
+JPN,Japan,Nagasaki Prefecture,27,13,2,0
+USA,United States,North Carolina,26,11,0,0
+PHL,Philippines,Masbate,25,12,5,0
+MDG,Madagascar,Sava,25,11,4,0
+JPN,Japan,Kōchi Prefecture,25,6,0,0
+MEX,Mexico,Veracruz,24,9,1,0
+JPN,Japan,Yamaguchi Prefecture,22,10,0,0
+BGD,Bangladesh,Chattogram,22,9,3,0
+JPN,Japan,Hokkaidō,22,1,0,0
+MEX,Mexico,Sinaloa,21,12,1,0
+PHL,Philippines,Oriental Mindoro,21,12,5,0
+JPN,Japan,Shizuoka Prefecture,21,11,1,0
+MDG,Madagascar,Toamasina,21,10,5,0
+PHL,Philippines,Cebu,21,10,3,1
+JPN,Japan,Wakayama Prefecture,21,7,0,0
+MEX,Mexico,Quintana Roo,20,11,5,2
+CHN,China,Guangxi,20,7,2,0
+IND,India,Tamil Nadu,20,6,0,0
+TWN,Taiwan,Hualien,19,13,8,0
+KOR,South Korea,South Jeolla,19,6,0,0
+PHL,Philippines,Iloilo,18,8,2,1
+IND,India,Odisha,18,4,3,0
+TWN,Taiwan,Yilan,17,12,3,0
+PHL,Philippines,Albay,17,11,7,1
+MEX,Mexico,Colima,17,6,3,0
+VNM,Vietnam,Quảng Ninh,17,6,1,0
+JPN,Japan,Tokyo,16,6,1,0
+CAN,Canada,Nova Scotia,15,7,0,0
+PHL,Philippines,Leyte,15,6,2,1
+USA,United States,South Carolina,15,4,1,0
+JPN,Japan,Kumamoto Prefecture,14,8,2,0
+JPN,Japan,Chiba Prefecture,14,5,0,0
+VUT,Vanuatu,Penama,14,5,2,1
+IND,India,West Bengal,14,4,2,0
+NCL,New Caledonia,North,13,9,3,0
+FJI,Fiji,Eastern,13,8,2,0
+PHL,Philippines,Batanes,13,7,4,2
+PHL,Philippines,Dinagat Islands,13,7,4,0
+PHL,Philippines,Pangasinan,13,7,0,0
+VNM,Vietnam,Quảng Bình,13,6,0,0
+JPN,Japan,Hyōgo Prefecture,13,4,0,0
+JPN,Japan,Ehime Prefecture,13,3,1,0
+PHL,Philippines,Sorsogon,12,8,4,0
+PHL,Philippines,Marinduque,12,6,3,0
+TWN,Taiwan,Pingtung,12,6,3,0
+VUT,Vanuatu,Malampa,12,3,0,0
+JPN,Japan,Aichi Prefecture,12,1,0,0
+JPN,Japan,Kanagawa Prefecture,11,7,1,0
+MEX,Mexico,Jalisco,11,7,2,0
+FJI,Fiji,Western,11,6,4,1
+MEX,Mexico,Tamaulipas,11,6,1,0
+MMR,Myanmar,Rakhine State,11,6,3,0
+CUB,Cuba,Matanzas,11,5,2,0
+KOR,South Korea,South Gyeongsang,11,5,0,0
+MEX,Mexico,Oaxaca,11,5,2,0
+VUT,Vanuatu,Sanma,11,5,2,0
+VNM,Vietnam,Khánh Hòa,11,2,1,0
+VNM,Vietnam,Nghệ An,11,2,0,0
+CHN,China,Jiangsu,11,1,0,0
+CUB,Cuba,Pinar del Río,10,6,2,0
+MEX,Mexico,Guerrero,10,6,1,1
+MEX,Mexico,Nayarit,10,6,3,0
+PRI,Puerto Rico,Puerto Rico,10,6,3,0
+PHL,Philippines,Catanduanes,10,5,4,1
+PHL,Philippines,Negros Occidental,10,5,1,0
+JPN,Japan,Miyazaki Prefecture,10,4,0,0
+PHL,Philippines,Bataan,10,4,2,0
+BLZ,Belize,Belize,10,3,0,0
+VNM,Vietnam,Phú Yên,10,3,1,0
+BGD,Bangladesh,Barisal,10,2,1,0
+JPN,Japan,Mie Prefecture,10,2,0,0
+NCL,New Caledonia,Loyalty Islands,10,1,0,0
+NIC,Nicaragua,South Caribbean Coast,9,6,2,0
+IND,India,Gujarat,9,4,2,0
+MDG,Madagascar,Menabe,9,3,0,0
+PHL,Philippines,Camarines Sur,9,3,1,0
+JPN,Japan,Okayama Prefecture,9,2,0,0
+GLP,Guadeloupe,Guadeloupe,9,1,1,0
+USA,United States,Virginia,9,1,0,0
+CAN,Canada,Newfoundland and Labrador,8,5,0,0
+MDG,Madagascar,Boeny,8,5,1,0
+MDG,Madagascar,Vatovavy-Fitovinany,8,5,0,0
+MOZ,Mozambique,Nampula,8,5,1,0
+PHL,Philippines,Southern Leyte,8,5,3,0
+GUM,Guam,Guam,8,4,1,0
+VUT,Vanuatu,Shefa,8,4,2,0
+VUT,Vanuatu,Tafea,8,4,3,1
+CHN,China,Shanghai,8,3,0,0
+JPN,Japan,Hiroshima Prefecture,8,3,0,0
+MDG,Madagascar,Atsimo-Andrefana,8,3,0,0
+MEX,Mexico,Sonora,8,2,0,0
+NCL,New Caledonia,South,8,2,1,0
+VNM,Vietnam,Hà Tĩnh,8,2,0,0
+VNM,Vietnam,Thanh Hóa,8,1,0,0
+VNM,Vietnam,Thái Bình,8,1,0,0
+CUB,Cuba,Isla de la Juventud,7,4,2,0
+JPN,Japan,Shimane Prefecture,7,4,0,0
+CUB,Cuba,Camagüey,7,3,1,1
+DOM,Dominican Republic,La Altagracia,7,3,1,0
+MOZ,Mozambique,Inhambane,7,3,0,0
+NIC,Nicaragua,North Caribbean Coast,7,3,3,1
+PHL,Philippines,Romblon,7,3,1,0
+JPN,Japan,Ishikawa Prefecture,7,2,0,0
+MDG,Madagascar,Diana,7,2,1,0
+MEX,Mexico,Michoacán,7,2,0,0
+MNP,Northern Mariana Islands,Northern Mariana Islands,7,2,1,0
+VNM,Vietnam,Bình Định,7,2,0,0
+PHL,Philippines,Batangas,7,1,0,0
+JPN,Japan,Miyagi Prefecture,7,0,0,0
+MOZ,Mozambique,Sofala,6,5,2,0
+MOZ,Mozambique,Zambezia,6,4,0,0
+PHL,Philippines,Samar,6,4,1,0
+FJI,Fiji,Northern,6,3,1,0
+JPN,Japan,Tokushima Prefecture,6,3,0,0
+PHL,Philippines,Camarines Norte,6,3,1,1
+PHL,Philippines,Guimaras,6,3,1,0
+PHL,Philippines,Northern Samar,6,3,2,0
+TON,Tonga,Haʻapai,6,3,1,0
+VNM,Vietnam,Quảng Nam,6,3,0,0
+BGD,Bangladesh,Khulna,6,2,1,0
+JPN,Japan,Fukuoka Prefecture,6,2,0,0
+PRK,North Korea,South Hwanghae,6,2,0,0
+TWN,Taiwan,Kinmen,6,2,0,0
+USA,United States,Mississippi,6,2,0,0
+USA,United States,New York,6,1,0,0
+VNM,Vietnam,Haiphong,6,1,1,0
+JPN,Japan,Aomori Prefecture,6,0,0,0
+JPN,Japan,Niigata Prefecture,6,0,0,0
+PNG,Papua New Guinea,Milne Bay,6,0,0,0
+USA,United States,Maryland,6,0,0,0
+PHL,Philippines,Biliran,5,4,1,0
+BHS,The Bahamas,Central Abaco,5,3,2,1
+CUB,Cuba,Guantánamo,5,3,1,0
+FRA,France,Réunion,5,3,0,0
+USA,United States,Alabama,5,3,1,0
+VGB,British Virgin Islands,British Virgin Islands,5,3,1,1
+VNM,Vietnam,Quảng Ngãi,5,3,0,0
+CAN,Canada,Prince Edward Island,5,2,0,0
+PHL,Philippines,Zambales,5,2,1,0
+SOM,Somalia,Bari,5,1,0,0
+USA,United States,New Jersey,5,1,0,0
+KOR,South Korea,South Chungcheong,5,0,0,0
+RUS,Russia,Sakhalin,5,0,0,0
+BHS,The Bahamas,East Grand Bahama,4,4,1,1
+BHS,The Bahamas,North Eleuthera,4,4,1,1
+ATG,Antigua and Barbuda,Barbuda,4,3,2,1
+BHS,The Bahamas,South Abaco,4,3,1,0
+CUB,Cuba,Villa Clara,4,3,1,0
+PHL,Philippines,Bohol,4,3,2,0
+PHL,Philippines,Negros Oriental,4,3,1,0
+BHS,The Bahamas,Long Island,4,2,0,0
+CUB,Cuba,Ciego de Ávila,4,2,1,0
+CUB,Cuba,Santiago de Cuba,4,2,2,0
+KOR,South Korea,Jeju,4,2,0,0
+MNP,Northern Mariana Islands,Saipan,4,2,1,0
+MNP,Northern Mariana Islands,Tinian,4,2,1,1
+PHL,Philippines,Lucena,4,2,0,0
+TWN,Taiwan,Kaohsiung,4,2,0,0
+TWN,Taiwan,Penghu,4,2,0,0
+HKG,Hong Kong,Sai Kung,4,1,0,0
+IND,India,Andaman and Nicobar Islands,4,1,0,0
+JPN,Japan,Kagawa Prefecture,4,1,0,0
+MDG,Madagascar,Melaky,4,1,0,0
+OMN,Oman,Dhofar,4,1,0,0
+TWN,Taiwan,New Taipei,4,1,0,0
+USA,United States,Connecticut,4,1,0,0
+USA,United States,Hawaii,4,1,1,0
+VNM,Vietnam,Nam Định,4,1,0,0
+VNM,Vietnam,Quảng Trị,4,1,0,0
+CHN,China,Shandong,4,0,0,0
+IDN,Indonesia,East Nusa Tenggara,4,0,0,0
+JPN,Japan,Akita Prefecture,4,0,0,0
+JPN,Japan,Iwate Prefecture,4,0,0,0
+KOR,South Korea,Gyeonggi,4,0,0,0
+NZL,New Zealand,West Coast,4,0,0,0
+PHL,Philippines,Surigao del Sur,4,0,0,0
+PRK,North Korea,North Pyongan,4,0,0,0
+USA,United States,Georgia,4,0,0,0
+VNM,Vietnam,Thừa Thiên Huế,4,0,0,0
+BHS,The Bahamas,Inagua,3,3,2,0
+JPN,Japan,Saga Prefecture,3,3,0,0
+VIR,United States Virgin Islands,Saint Croix,3,3,1,0
+BHS,The Bahamas,Central Andros,3,2,0,0
+BHS,The Bahamas,San Salvador Island,3,2,1,0
+CUB,Cuba,Artemisa,3,2,2,0
+CUB,Cuba,Holguín,3,2,1,0
+DMA,Dominica,Saint David,3,2,1,1
+MOZ,Mozambique,Cabo Delgado,3,2,2,0
+PHL,Philippines,La Union,3,2,0,0
+PHL,Philippines,Occidental Mindoro,3,2,2,0
+BHS,The Bahamas,Acklins,3,1,1,0
+BLZ,Belize,Stann Creek,3,1,0,0
+HTI,Haiti,Sud-Est,3,1,0,0
+MDG,Madagascar,Atsimo-Atsinanana,3,1,1,0
+MDG,Madagascar,Sofia,3,1,0,0
+MEX,Mexico,Baja California,3,1,0,0
+OMN,Oman,Al Wusta,3,1,0,0
+PHL,Philippines,Aklan,3,1,0,0
+PHL,Philippines,Capiz,3,1,0,0
+PHL,Philippines,Tacloban,3,1,1,0
+TCA,Turks and Caicos Islands,Providenciales and West Caicos,3,1,0,0
+TCA,Turks and Caicos Islands,South Caicos and East Caicos,3,1,0,0
+USA,United States,Rhode Island,3,1,0,0
+VUT,Vanuatu,Torba,3,1,0,0
+COL,Colombia,La Guajira,3,0,0,0
+DOM,Dominican Republic,Barahona,3,0,0,0
+HND,Honduras,Gracias a Dios,3,0,0,0
+IDN,Indonesia,Maluku,3,0,0,0
+KOR,South Korea,North Jeolla,3,0,0,0
+MTQ,Martinique,Martinique,3,0,0,0
+NZL,New Zealand,Bay of Plenty,3,0,0,0
+PHL,Philippines,Antique,3,0,0,0
+PHL,Philippines,Ilocos Norte,3,0,0,0
+PRT,Portugal,Azores,3,0,0,0
+VEN,Venezuela,Falcón,3,0,0,0
+BHS,The Bahamas,West Grand Bahama,2,2,0,0
+BMU,Bermuda,Saint George,2,2,0,0
+BMU,Bermuda,Southampton,2,2,0,0
+KOR,South Korea,Busan,2,2,0,0
+MMR,Myanmar,Ayeyarwady,2,2,1,0
+MUS,Mauritius,Agaléga,2,2,0,0
+ATG,Antigua and Barbuda,Saint Philip,2,1,0,0
+BHS,The Bahamas,Crooked Island,2,1,1,0
+COK,Cook Islands,Palmerston Island,2,1,0,0
+CUB,Cuba,Sancti Spíritus,2,1,0,0
+DOM,Dominican Republic,Samaná,2,1,0,0
+DOM,Dominican Republic,San Pedro de Macorís,2,1,1,0
+HKG,Hong Kong,Tai Po,2,1,0,0
+IND,India,Maharashtra,2,1,0,0
+JAM,Jamaica,Saint Catherine,2,1,1,0
+JAM,Jamaica,Saint Thomas,2,1,0,0
+JAM,Jamaica,Westmoreland,2,1,1,1
+KOR,South Korea,Ulsan,2,1,0,0
+MEX,Mexico,Yucatán,2,1,1,0
+MMR,Myanmar,Tanintharyi,2,1,0,0
+MYT,Mayotte,Mayotte,2,1,1,0
+OMN,Oman,Ash Sharqiyah,2,1,0,0
+PHL,Philippines,Davao Oriental,2,1,1,0
+SLB,Solomon Islands,Rennell and Bellona,2,1,0,0
+TON,Tonga,Niuas,2,1,0,0
+TON,Tonga,Tongatapu,2,1,0,0
+TWN,Taiwan,Chiayi,2,1,0,0
+VCT,Saint Vincent and the Grenadines,Charlotte,2,1,0,0
+VNM,Vietnam,Da Nang,2,1,0,0
+AUS,Australia,,2,0,0,0
+BHS,The Bahamas,Bimini,2,0,0,0
+BHS,The Bahamas,Mayaguana,2,0,0,0
+BLZ,Belize,Corozal,2,0,0,0
+BRB,Barbados,Saint Philip,2,0,0,0
+CAN,Canada,New Brunswick,2,0,0,0
+CAN,Canada,Quebec,2,0,0,0
+CHN,China,Liaoning,2,0,0,0
+CUB,Cuba,Mayabeque,2,0,0,0
+DOM,Dominican Republic,Pedernales,2,0,0,0
+DOM,Dominican Republic,San Cristóbal,2,0,0,0
+GRD,Grenada,Saint Andrew,2,0,0,0
+HND,Honduras,Bay Islands,2,0,0,0
+HTI,Haiti,Nord-Ouest,2,0,0,0
+HTI,Haiti,Ouest,2,0,0,0
+JAM,Jamaica,Clarendon,2,0,0,0
+JPN,Japan,Ōita Prefecture,2,0,0,0
+JPN,Japan,Ōsaka Prefecture,2,0,0,0
+LKA,Sri Lanka,Ampara,2,0,0,0
+MEX,Mexico,Campeche,2,0,0,0
+MEX,Mexico,Chiapas,2,0,0,0
+MEX,Mexico,Tabasco,2,0,0,0
+NZL,New Zealand,Northland,2,0,0,0
+NZL,New Zealand,Waikato,2,0,0,0
+PHL,Philippines,Puerto Princesa,2,0,0,0
+PRK,North Korea,South Pyongan,2,0,0,0
+SLB,Solomon Islands,Makira-Ulawa,2,0,0,0
+SOM,Somalia,Nugal,2,0,0,0
+THA,Thailand,Nakhon Si Thammarat,2,0,0,0
+TTO,Trinidad and Tobago,Sangre Grande Regional Corporation,2,0,0,0
+TTO,Trinidad and Tobago,Tobago,2,0,0,0
+TZA,Tanzania,Pwani,2,0,0,0
+USA,United States,Maine,2,0,0,0
+USA,United States,Massachusetts,2,0,0,0
+VCT,Saint Vincent and the Grenadines,Saint George,2,0,0,0
+VEN,Venezuela,Nueva Esparta,2,0,0,0
+VNM,Vietnam,Bà Rịa-Vũng Tàu,2,0,0,0
+WSM,Samoa,A'ana,2,0,0,0
+YEM,Yemen,Al Mahrah,2,0,0,0
+AIA,Anguilla,Blowing Point,1,1,0,0
+ASM,American Samoa,Western District,1,1,0,0
+ATG,Antigua and Barbuda,Saint Paul,1,1,1,0
+BHS,The Bahamas,Cat Island,1,1,1,0
+BHS,The Bahamas,Central Eleuthera,1,1,1,0
+BHS,The Bahamas,Exuma,1,1,0,0
+BHS,The Bahamas,Harbour Island,1,1,0,0
+BHS,The Bahamas,North Abaco,1,1,1,0
+BHS,The Bahamas,South Eleuthera,1,1,0,0
+BLM,Saint Barthélemy,Saint Barthélemy,1,1,0,0
+BLZ,Belize,Toledo,1,1,1,0
+BMU,Bermuda,Sandys Parish,1,1,0,0
+BMU,Bermuda,Warwick,1,1,0,0
+BRA,Brazil,Santa Catarina,1,1,0,0
+COL,Colombia,Archipelago of Saint Andréws,1,1,0,0
+CYM,Cayman Islands,Cayman Islands,1,1,0,0
+DOM,Dominican Republic,Azua,1,1,0,0
+FJI,Fiji,Central,1,1,1,0
+HKG,Hong Kong,Lantau Island,1,1,0,0
+HKG,Hong Kong,Tsuen Wan,1,1,0,0
+HND,Honduras,Colón,1,1,0,0
+HTI,Haiti,Sud,1,1,1,0
+JPN,Japan,Yamagata Prefecture,1,1,0,0
+KNA,Saint Kitts and Nevis,Saint James Windward,1,1,1,0
+KOR,South Korea,Incheon,1,1,0,0
+LKA,Sri Lanka,Trincomalee,1,1,0,0
+MAF,Saint Martin,Saint Martin,1,1,0,0
+MUS,Mauritius,Rivière du Rempart,1,1,0,0
+PHL,Philippines,Ormoc,1,1,0,0
+PYF,French Polynesia,Leeward Islands,1,1,1,0
+SCR,Scarborough Shoal,,1,1,0,0
+SLB,Solomon Islands,Malaita,1,1,0,0
+SXM,Sint Maarten,Sint Maarten,1,1,1,1
+TCA,Turks and Caicos Islands,Grand Turk,1,1,0,0
+THA,Thailand,Chumphon,1,1,1,0
+TON,Tonga,ʻEua,1,1,1,0
+TWN,Taiwan,Changhua,1,1,0,0
+WSM,Samoa,Atua,1,1,0,0
+WSM,Samoa,Gaga'ifomauga,1,1,1,0
+YEM,Yemen,Hadhramaut,1,1,1,0
+YEM,Yemen,Shabwah,1,1,0,0
+AIA,Anguilla,East End,1,0,0,0
+ASM,American Samoa,Manu'a Islands,1,0,0,0
+ATF,French Southern and Antarctic Lands,Scattered Islands in the Indian Ocean,1,0,0,0
+ATG,Antigua and Barbuda,Saint Peter,1,0,0,0
+BGD,Bangladesh,Dhaka,1,0,0,0
+BHS,The Bahamas,Mangrove Cay,1,0,0,0
+BHS,The Bahamas,New Providence,1,0,0,0
+BHS,The Bahamas,South Andros,1,0,0,0
+BRB,Barbados,Christ Church,1,0,0,0
+CHN,China,Paracel Islands,1,0,0,0
+COK,Cook Islands,Atiu,1,0,0,0
+COK,Cook Islands,Mauke,1,0,0,0
+COL,Colombia,Magdalena,1,0,0,0
+COM,Comoros,Andjazîdja,1,0,0,0
+CPV,Cape Verde,Boa Vista,1,0,0,0
+CPV,Cape Verde,Paul,1,0,0,0
+CUB,Cuba,Granma,1,0,0,0
+CUW,Curaçao,Curaçao,1,0,0,0
+DOM,Dominican Republic,María Trinidad Sánchez,1,0,0,0
+DOM,Dominican Republic,Nacional,1,0,0,0
+DOM,Dominican Republic,Puerto Plata,1,0,0,0
+FSM,Micronesia,Yap State,1,0,0,0
+GTM,Guatemala,Retalhuleu,1,0,0,0
+GTM,Guatemala,Santa Rosa,1,0,0,0
+HKG,Hong Kong,North District,1,0,0,0
+IDN,Indonesia,Aceh,1,0,0,0
+IND,India,Karnataka,1,0,0,0
+IND,India,Kerala,1,0,0,0
+JAM,Jamaica,Portland,1,0,0,0
+JPN,Japan,Fukui Prefecture,1,0,0,0
+JPN,Japan,Ibaraki Prefecture,1,0,0,0
+JPN,Japan,Kyōto Prefecture,1,0,0,0
+LCA,Saint Lucia,Dennery Quarter,1,0,0,0
+LCA,Saint Lucia,Praslin Quarter,1,0,0,0
+LCA,Saint Lucia,Vieux Fort Quarter,1,0,0,0
+LKA,Sri Lanka,Mullaitivu,1,0,0,0
+LKA,Sri Lanka,Puttalam,1,0,0,0
+MDV,Maldives,Haa Alif Atoll,1,0,0,0
+MDV,Maldives,Kaafu Atoll,1,0,0,0
+MEX,Mexico,,1,0,0,0
+MHL,Marshall Islands,Ralik Chain,1,0,0,0
+MHL,Marshall Islands,Ratak Chain,1,0,0,0
+MMR,Myanmar,Mon State,1,0,0,0
+MMR,Myanmar,Yangon,1,0,0,0
+MNP,Northern Mariana Islands,Rota,1,0,0,0
+MSR,Montserrat,Saint Anthony,1,0,0,0
+MSR,Montserrat,Saint Peter,1,0,0,0
+MUS,Mauritius,Rodrigues,1,0,0,0
+MYS,Malaysia,Johor,1,0,0,0
+MYS,Malaysia,Sabah,1,0,0,0
+NIC,Nicaragua,Chinandega,1,0,0,0
+NIC,Nicaragua,León,1,0,0,0
+NIU,Niue,Niue,1,0,0,0
+NLD,Netherlands,Bonaire,1,0,0,0
+NZL,New Zealand,Antipodes Islands,1,0,0,0
+NZL,New Zealand,Auckland,1,0,0,0
+NZL,New Zealand,Campbell Islands,1,0,0,0
+NZL,New Zealand,Chatham Islands,1,0,0,0
+NZL,New Zealand,Gisborne,1,0,0,0
+NZL,New Zealand,Marlborough,1,0,0,0
+NZL,New Zealand,Southland,1,0,0,0
+NZL,New Zealand,Taranaki,1,0,0,0
+OMN,Oman,Al Batinah North,1,0,0,0
+PAK,Pakistan,Balochistan,1,0,0,0
+PGA,Wake Island,Spratly Islands,1,0,0,0
+PHL,Philippines,Ilocos Sur,1,0,0,0
+PHL,Philippines,Misamis Occidental,1,0,0,0
+PHL,Philippines,Zamboanga del Norte,1,0,0,0
+PHL,Philippines,Zamboanga del Sur,1,0,0,0
+PLW,Palau,Koror,1,0,0,0
+PLW,Palau,Peleliu,1,0,0,0
+PRK,North Korea,North Hamgyong,1,0,0,0
+PRK,North Korea,South Hamgyong,1,0,0,0
+PRT,Portugal,Leiria,1,0,0,0
+PYF,French Polynesia,Austral Islands,1,0,0,0
+PYF,French Polynesia,Tuamotu Archipelago,1,0,0,0
+SLB,Solomon Islands,Guadalcanal,1,0,0,0
+SOL,Somaliland,Somaliland,1,0,0,0
+SPM,Saint Pierre and Miquelon,Miquelon-Langlade,1,0,0,0
+SYC,Seychelles,Coralline Seychelles,1,0,0,0
+TCA,Turks and Caicos Islands,Middle Caicos,1,0,0,0
+TCA,Turks and Caicos Islands,North Caicos,1,0,0,0
+THA,Thailand,Prachuap Khiri Khan,1,0,0,0
+TON,Tonga,Vavaʻu,1,0,0,0
+TTO,Trinidad and Tobago,Mayaro-Rio Claro,1,0,0,0
+TTO,Trinidad and Tobago,Princes Town,1,0,0,0
+TUV,Tuvalu,Tuvalu,1,0,0,0
+TWN,Taiwan,Taichung City,1,0,0,0
+TWN,Taiwan,Tainan,1,0,0,0
+VEN,Venezuela,Federal Dependencies,1,0,0,0
+VEN,Venezuela,Sucre,1,0,0,0
+VEN,Venezuela,Zulia,1,0,0,0
+VIR,United States Virgin Islands,Saint John,1,0,0,0
+VIR,United States Virgin Islands,Saint Thomas,1,0,0,0
+VNM,Vietnam,Bình Thuận,1,0,0,0
+VNM,Vietnam,Cà Mau,1,0,0,0
+VNM,Vietnam,Ninh Bình,1,0,0,0
+VNM,Vietnam,Ninh Thuận,1,0,0,0
+VNM,Vietnam,Sóc Trăng,1,0,0,0
+VNM,Vietnam,Trà Vinh,1,0,0,0
+WLF,Wallis and Futuna,Uvea,1,0,0,0
+WSM,Samoa,Gaga'emauga,1,0,0,0
+WSM,Samoa,Vaisigano,1,0,0,0

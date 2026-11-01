@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hurricane Tracks</title>
+<meta name="description" content="Every hurricane, typhoon and tropical cyclone in NOAA's global best track archive since 1851, on one map: where they form, where they hit, the strongest on record, and whether they are getting stronger.">
+<meta property="og:title" content="Every hurricane and typhoon since 1851: where they form, where they hit, and whether they are getting stronger">
+<meta property="og:description" content="{{counts.n_systems|int}} storms on one map. Since 1980 the share of storms reaching Category 4 or 5 has risen from {{k.c4_1980s|pc}} in the 1980s to {{k.c4_2010s|pc}} in the 2010s, and peak intensity has moved poleward, but the early record misses many storms.">
+<meta property="og:image" content="https://maps.tristanhotham.com/hurricane-tracks/header.png">
+<meta property="og:url" content="https://maps.tristanhotham.com/hurricane-tracks/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Weather chart: pale paper, storm ink, Saffir-Simpson warmth from blue to plum. */
+:root{
+  --bg:#F6F4EF; --panel:#EAE7DF; --fg:#1C2027; --muted:#626870; --rule:#DDD8CC; --card:#FFFEFA; --border:#CBC5B8;
+  --hot:#C01D3D; --cool:#3F8CC4; --gold:#E9A23B; --ink:#1F3A5F; --land:#E6E2D8; --sea:#E7EDF0; --pre:#B9B2A6;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11151C; --panel:#1B212B; --fg:#ECEEF1; --muted:#A2A8B0; --rule:#2E3540; --card:#161B23; --border:#444B57;
+  --hot:#FF5C78; --cool:#6FB6EA; --gold:#F5C14E; --ink:#A9C2E6; --land:#232831; --sea:#121820; --pre:#5D584F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11151C; --panel:#1B212B; --fg:#ECEEF1; --muted:#A2A8B0; --rule:#2E3540; --card:#161B23; --border:#444B57;
+  --hot:#FF5C78; --cool:#6FB6EA; --gold:#F5C14E; --ink:#A9C2E6; --land:#232831; --sea:#121820; --pre:#5D584F; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 18px/1.62 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+.wrap{max-width:700px;margin:0 auto;padding-block:28px 64px}
+.wrap .bleed{width:min(1180px,calc(100vw - 32px));margin-left:calc((100% - min(1180px,100vw - 32px))/2);margin-right:0}
+a{color:inherit;text-decoration-color:var(--hot);text-underline-offset:3px}
+.kicker{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.kicker b{background:var(--ink);color:var(--bg);padding:5px 8px;font-weight:500}
+header.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:end;border-bottom:6px double var(--fg);padding-bottom:22px;margin-top:18px}
+h1{font:900 clamp(46px,11.5vw,100px)/.9 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .a{color:var(--hot)}
+.mark{width:clamp(78px,16vw,128px);height:auto;display:block;color:var(--fg)}
+.dek{grid-column:1/-1;font-size:21px;line-height:1.42;margin:8px 0 0;max-width:58ch}
+.byline{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:14px}
+h2{font:800 34px/1.04 var(--display);letter-spacing:-.01em;margin:54px 0 10px;text-wrap:balance}
+h2 .n{font:500 13px/1 var(--mono);color:var(--hot);display:block;letter-spacing:.1em;margin-bottom:10px}
+h3{font:600 20px/1.25 var(--display);margin:28px 0 6px}
+p{margin:0 0 16px}
+.lede::first-letter{font:900 72px/.8 var(--display);float:left;margin:6px 10px 0 0;color:var(--hot)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:26px 0 8px}
+.stats div{background:var(--card);padding:14px 12px}
+.stats b{display:block;font:900 clamp(22px,4.4vw,32px)/1 var(--display);letter-spacing:-.01em}
+.stats b.h{color:var(--hot)} .stats b.c{color:var(--cool)} .stats b.g{color:var(--gold)} .stats b.p{color:var(--ink)}
+.stats span{font:400 12px/1.35 var(--mono);color:var(--muted);display:block;margin-top:6px}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.figure{margin:26px 0 30px}
+.fig-h{font:600 19px/1.25 var(--display);margin:0 0 4px}
+.fig-sub{font:400 13px/1.45 var(--mono);color:var(--muted);margin:0 0 12px}
+.src{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:10px}
+.chart{width:100%;position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--mono);fill:var(--fg)}
+.lab{font-size:12px}.lab.m{fill:var(--muted)}.lab.b{font-weight:500}.lab.s{font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font:400 12px/1.45 var(--mono);padding:8px 10px;border-radius:3px;max-width:300px;z-index:1000;transform:translate(-50%,calc(-100% - 12px));display:none}
+.tip b{font-weight:500}
+.controls{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
+.scrollrow{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px;max-width:100%}
+.scrollrow .btn{flex:0 0 auto;white-space:nowrap}
+.ctl-l{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px;flex:0 0 auto;align-self:center}
+.btn{font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;cursor:pointer;min-height:36px}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.2)}
+.btn[aria-pressed="false"] i{opacity:.35}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.searchbox{position:relative;flex:1 1 260px;min-width:0}
+input[type=search]{font:400 15px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 11px;min-height:40px;width:100%}
+.suggest{position:absolute;left:0;right:0;top:100%;margin:2px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--border);z-index:1001;font:400 13px/1.3 var(--mono);display:none;max-height:340px;overflow:auto}
+.suggest li{padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--rule)}
+.suggest li span{color:var(--muted)}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--panel)}
+.timebar{display:flex;gap:10px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
+.timebar .play{min-width:44px;font-size:14px}
+.timebar input[type=range]{flex:1 1 220px;accent-color:var(--hot);min-width:0}
+.yearlab{font:800 26px/1 var(--display);min-width:6.5ch;font-variant-numeric:tabular-nums}
+.yearlab small{display:block;font:400 11px/1.2 var(--mono);color:var(--muted);margin-top:3px}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}
+@media (max-width:900px){.mapgrid{grid-template-columns:1fr}}
+.side{background:var(--card);border:1px solid var(--border);padding:12px 12px 10px;font:400 13px/1.45 var(--mono);max-height:660px;overflow:auto}
+@media (max-width:900px){.side{max-height:none}}
+.side h4{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.side h4:first-child{margin-top:2px}
+.side .big{font:800 24px/1.1 var(--display);margin:2px 0 4px}
+.side .sub{color:var(--muted);font-size:12px;margin:0 0 8px}
+.side ol,.side ul{margin:4px 0 8px;padding-left:20px}
+.side li{margin:3px 0}
+.side li small,.side td small{color:var(--muted)}
+.side table{width:100%;border-collapse:collapse;margin:4px 0 6px}
+.side td{padding:4px 4px 4px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.side td.num{text-align:right;white-space:nowrap}
+.back{font:400 12px var(--mono);background:none;border:0;color:var(--muted);padding:0;cursor:pointer;text-decoration:underline;margin-bottom:6px}
+.go{cursor:pointer;text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:3px}
+.catbar{display:flex;height:12px;border-radius:2px;overflow:hidden;margin:6px 0 4px;border:1px solid var(--rule)}
+.catbar span{display:block;height:100%}
+.lmap{height:640px;border:1px solid var(--border);background:var(--sea);border-radius:2px}
+@media (max-width:600px){.lmap{height:min(64vh,480px)}}
+.leaflet-container{font:400 12px/1.4 var(--mono);background:var(--sea)}
+.trkcanvas{position:absolute;left:0;top:0;pointer-events:none}
+.leaflet-zoom-anim .trkcanvas{opacity:0}
+.lyrBtn{background:var(--card,var(--bg));color:var(--fg);border:1px solid var(--border);border-radius:3px;font:600 12px/1 var(--mono);padding:8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.lyrBtn[aria-expanded="true"]{background:var(--fg);color:var(--bg)}
+.lyrPanel{background:var(--card,var(--bg));color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 12px 8px;margin-top:6px;width:260px;box-shadow:0 2px 10px rgba(0,0,0,.15);font:400 12px/1.3 var(--mono);max-height:min(70vh,540px);overflow:auto}
+.lyrPanel[hidden]{display:none}
+.lyrPanel .row{margin:0 0 9px}
+.lyrPanel label{display:flex;gap:6px;align-items:center;cursor:pointer;font-weight:600}
+.lyrPanel input[type=range]{width:100%;accent-color:var(--fg)}
+.lyrPanel select{font:400 12px var(--mono);background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:2px;padding:2px 4px;width:100%;min-height:0}
+.lyrPanel .sub{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:11px;margin-top:3px}
+.lyrPanel .sub span{flex:0 0 58px}
+.lyrPanel .hd{font:500 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 7px;border-top:1px solid var(--rule);padding-top:9px}
+.lyrPanel .reset{font:400 11px var(--mono);color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.cityL{font:500 11px/1 var(--mono);color:var(--fg);white-space:nowrap;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg),0 0 2px var(--bg);pointer-events:none}
+.cityL i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg);margin-right:4px;vertical-align:1px}
+.cityL.s{font-size:10px;font-weight:400}
+.cntL{font:700 11px/1 var(--mono);color:var(--fg);white-space:nowrap;text-transform:uppercase;letter-spacing:.06em;opacity:.75;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg);pointer-events:none;text-align:center}
+.mapnote{background:color-mix(in srgb,var(--card) 92%,transparent);border:1px solid var(--border);border-radius:3px;padding:6px 9px;font:400 12px/1.35 var(--mono);max-width:min(300px,62vw);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.mapnote b{font-weight:600}
+.mapnote:empty{display:none}
+.leaflet-bar a,.leaflet-bar a:hover{background:var(--card);color:var(--fg);border-bottom-color:var(--border)}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--card) 85%,transparent)!important;color:var(--muted)}
+.leaflet-control-attribution a{color:var(--fg)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--fg)}
+.leaflet-popup-content{font:400 12.5px/1.45 var(--mono);margin:10px 12px}
+.leaflet-popup-content b{font:700 15px/1.2 var(--display)}
+.pcat{display:inline-block;font:500 11px/1 var(--mono);padding:3px 6px;border-radius:2px;color:#fff;margin:2px 0}
+.legend{display:flex;gap:6px 14px;flex-wrap:wrap;font:400 12px/1.3 var(--mono);color:var(--muted);margin-top:8px;align-items:center}
+.legend span{display:inline-flex;align-items:center}
+.legend i{display:inline-block;width:13px;height:13px;margin-right:6px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.legend i.ln{width:20px;height:4px;border-radius:2px;border:0}
+.legend i.sq{border-radius:2px}
+.legend .ramp{display:inline-block;width:130px;height:12px;border-radius:2px;margin:0 6px;border:1px solid rgba(0,0,0,.1)}
+.pull{font:600 26px/1.25 var(--display);border-left:6px solid var(--hot);padding:4px 0 4px 18px;margin:30px 0}
+.note{background:var(--panel);border:1px solid var(--rule);padding:14px 16px;font-size:16px;margin:22px 0}
+.note h3{margin-top:0}
+.verdict{border:2px solid var(--fg);background:var(--card);padding:16px 18px;margin:24px 0}
+.verdict h3{margin:0 0 8px}
+.verdict p:last-child{margin-bottom:0}
+table.tbl{width:100%;border-collapse:collapse;font:400 13px/1.4 var(--mono)}
+table.tbl th{font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 6px 6px 0;border-bottom:2px solid var(--fg)}
+table.tbl td{padding:6px 6px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+table.tbl td.r,table.tbl th.r{text-align:right;white-space:nowrap}
+table.tbl tr[data-i]{cursor:pointer}
+table.tbl tr[data-i]:hover td{background:var(--panel)}
+table.tbl .bar{display:inline-block;height:9px;border-radius:1px;vertical-align:0;margin-right:1px}
+.tablebox{max-height:470px;overflow:auto;border:1px solid var(--border);background:var(--card);padding:0 10px}
+details{margin:14px 0}
+summary{font:500 13px/1.4 var(--mono);cursor:pointer;color:var(--fg);padding:8px 0}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.cta a{font:500 13px/1 var(--mono);text-decoration:none;border:1px solid var(--fg);padding:11px 14px;border-radius:3px}
+.cta a.p{background:var(--hot);border-color:var(--hot);color:#fff}
+footer{border-top:6px double var(--fg);margin-top:56px;padding-top:16px;font:400 13px/1.55 var(--mono);color:var(--muted)}
+footer p{margin:0 0 10px}
+.theme{position:fixed;right:12px;bottom:12px;z-index:1002}
+@media print{.theme,.controls{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="kicker"><b>Data study</b><span>Tropical cyclones</span><span>World, 1851 to 2026</span></div>
+<header class="hero">
+  <h1>Every <span class="a">storm</span> since 1851</h1>
+  <svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><g id="heroMark"></g></svg>
+  <p class="dek">Every hurricane, typhoon and cyclone in NOAA's global best track archive, {{counts.n_systems|int}} storms in all, drawn by strength. Where they form, where they hit, the strongest on record, and the hard question: are they getting stronger? Since 1980, more of them reach Category 4 or 5, and they peak further from the equator. Before satellites, the record misses too many storms to say much more.</p>
+</header>
+<div class="byline">Dr Tristan Hotham · Independent researcher · 2026 · Data: NOAA National Centers for Environmental Information, IBTrACS v04r01 (Knapp et al. 2010); Natural Earth</div>
+
+<div class="stats">
+  <div><b class="p">{{counts.n_systems|int}}</b><span>tropical storms and depressions tracked, {{meta.first|raw}} to {{meta.last|raw}}; {{counts.n_hu|int}} reached hurricane or typhoon strength</span></div>
+  <div><b class="c">{{k.ts_per_year|int}} a year</b><span>storms reaching tropical storm strength since 1980, {{k.hu_per_year|int}} of them hurricanes or typhoons: no clear trend in the number</span></div>
+  <div><b class="h">{{k.c4_1980s|pc}} to {{k.c4_2010s|pc}}</b><span>share of storms reaching Category 4 or 5, the 1980s against the 2010s</span></div>
+  <div><b class="g">{{k.lmi_g_km|int}} km</b><span>per decade: how far the place where storms peak has moved towards the poles since 1980</span></div>
+</div>
+
+<p class="lede">Since 1851, the first season in the American record, ships, coastal stations and, later, aircraft and satellites have tracked the great storms of the tropics. NOAA's International Best Track Archive for Climate Stewardship, IBTrACS, gathers the tracks of every agency into one global record: the position, wind and pressure of every tropical cyclone, every six hours, from the Atlantic hurricanes of the 1850s to this year's typhoons. That is {{meta.n_points|int}} positions for {{meta.n_storms|int}} storms.</p>
+<p>Here is all of it on one map, coloured on the Saffir-Simpson scale, from tropical depressions in pale blue to Category 5 in deep plum. Below the map I count where they form, where they come ashore and which were the strongest, and then look honestly at whether they are getting stronger. The honest part matters: before weather satellites, many storms that stayed out at sea were never seen, so the early record is thin, and its winds were often guessed or not recorded at all.</p>
+
+<h2><span class="n">01 · The map</span>Every track, by strength</h2>
+<p>Each line is a storm, coloured by its strength at each point. Play the years, pick a period, filter by basin or strength, or search for a storm by name. Click a track for the storm's name, year, peak wind and the countries it hit. Landfalls, where storms form, and the base map and labels are under Map layers.</p>
+<div class="bleed" id="atlas">
+<div class="controls">
+  <div class="scrollrow" id="perRow"><span class="ctl-l">Period</span><button class="btn" data-p="all" aria-pressed="true">All, 1851 to 2026</button><button class="btn" data-p="sat" aria-pressed="false">Satellite era, since 1980</button><button class="btn" data-p="pre" aria-pressed="false">Before 1970</button><button class="btn" data-p="dec" aria-pressed="false">Last ten years</button></div>
+</div>
+<div class="timebar">
+  <button class="btn play" id="play" aria-label="Play the years one by one">▶</button>
+  <input type="range" id="yr" min="1850" max="2026" step="1" value="2026" aria-label="Year">
+  <div class="yearlab" id="yrlab">All<small>drag to pick a year</small></div>
+</div>
+<div class="controls"><div class="scrollrow" id="basRow"><span class="ctl-l">Basins</span></div></div>
+<div class="controls">
+  <div class="scrollrow" id="minRow"><span class="ctl-l">At least</span><button class="btn" data-m="-1" aria-pressed="true">Everything</button><button class="btn" data-m="1" aria-pressed="false">Tropical storm</button><button class="btn" data-m="2" aria-pressed="false">Category 1</button><button class="btn" data-m="4" aria-pressed="false">Category 3</button><button class="btn" data-m="5" aria-pressed="false">Category 4</button><button class="btn" data-m="6" aria-pressed="false">Category 5</button></div>
+</div>
+<div class="controls">
+  <div class="searchbox"><input type="search" id="q" placeholder="Search a storm (Katrina, Haiyan 2013) or a country" aria-label="Search a storm or a country" autocomplete="off"><ul class="suggest" id="sug" role="listbox"></ul></div>
+</div>
+<div class="controls"><div class="scrollrow" id="focusRow"><span class="ctl-l">Zoom to</span></div></div>
+<div class="mapgrid">
+  <div><div id="map" class="lmap" role="application" aria-label="World map of tropical cyclone tracks coloured by Saffir-Simpson category"></div>
+    <div class="legend" id="legend"></div></div>
+  <div class="side" id="side" aria-live="polite"></div>
+</div>
+<p class="src">Tracks: NOAA NCEI, IBTrACS v04r01, all basins, 6-hourly positions, main and provisional tracks (the {{meta.last|raw}} and 2026 storms are partly provisional). Colour: Saffir-Simpson category from the 1-minute sustained wind of the US agencies (NHC, CPHC, JTWC) where given, else the responsible agency's wind (often a 10-minute average, which reads lower); grey where no wind was recorded. Tracks are simplified for the web. Landfalls: where a track crosses from sea onto land in Natural Earth's 1:10m countries, at tropical storm strength or more. Base map tiles © Esri.</p>
+</div>
+
+<h2><span class="n">02 · How many</span>About {{k.ts_per_year|int}} a year, and a record that used to miss them</h2>
+<p>Since 1980, when geostationary satellites watched the whole tropics, an average of {{counts.sat_ts_mean|f1}} storms a year have reached tropical storm strength (winds of 34 knots, 39 mph, or more), and {{counts.sat_hu_mean|f1}} have become hurricanes, typhoons or severe cyclones (64 knots, 74 mph). The quietest season was {{counts.sat_ts_min_year|raw}} with {{counts.sat_ts_min|int}}, the busiest {{counts.sat_ts_max_year|raw}} with {{counts.sat_ts_max|int}}. The western North Pacific, the typhoon basin, has {{counts.basin_ts_share.WP|pc}} of them; the North Atlantic, the most studied, only {{counts.basin_ts_share.NA|pc}}. Over those {{counts.sat_years|int}} seasons the number has not clearly changed: the fitted trend is {{counts.sat_ts_trend.per_dec|sf1}} storms a decade, with a 95% interval of {{counts.sat_ts_trend.lo|sf1}} to {{counts.sat_ts_trend.hi|sf1}}.</p>
+<div class="figure"><p class="fig-h">Storms per season, by basin where they formed</p><p class="fig-sub">Hover a bar. The shaded years before 1970 are before satellite coverage: the record there misses storms, and outside the Atlantic it has no winds at all before the 1940s.</p>
+<div class="controls"><div class="scrollrow" id="pyRow"><span class="ctl-l">Count</span><button class="btn" data-k="ts" aria-pressed="true">Tropical storm strength</button><button class="btn" data-k="hu" aria-pressed="false">Hurricane strength</button><button class="btn" data-k="all" aria-pressed="false">Every system in the archive</button></div>
+<div class="scrollrow" id="pyRange"><span class="ctl-l">Years</span><button class="btn" data-r="all" aria-pressed="true">1851 to {{meta.last|raw}}</button><button class="btn" data-r="sat" aria-pressed="false">Since 1980</button></div></div>
+<div class="chart" id="pyChart"></div><div class="legend" id="pyLegend"></div></div>
+<p>Look at the long record and the storms seem to multiply. In the North Atlantic, the one basin with winds back to 1851, there were {{counts.na_ts_py_1851_1900|f1}} tropical storms a season from 1851 to 1900, and {{counts.na_ts_py_1976_2025|f1}} from 1976 to 2025. But this is mostly a story about seeing, not about storms. In the nineteenth century a storm was recorded only if it hit land or a ship ran into it. Storms that stayed far out at sea are exactly the ones that were missed: only {{counts.na_far_pct_1851_1900|pc}} of the early Atlantic storms never came within 500 km of land, against {{counts.na_far_pct_1976_2025|pc}} in the last fifty years. For hurricanes, which are harder to miss, the rise is smaller: {{counts.na_hu_py_1851_1900|f1}} a season then, {{counts.na_hu_py_1976_2025|f1}} now. Elsewhere it is starker: the archive has tracks for the Bay of Bengal from the 1850s and for the South Indian Ocean from 1851, but no winds until the {{counts.first_wind.SI|raw}}s and {{counts.first_wind.NI|raw}}s. Only {{counts.coverage.5.any_pct|pc}} of the systems of the 1900s have any wind at all, against {{counts.coverage.14.any_pct|pc}} in the 1990s.</p>
+<div class="note"><h3>Why I lean on 1980 onwards</h3><p>Polar-orbiting weather satellites were declared operational in 1965, and it took several years for warning centres to learn to read storms from them; the Dvorak technique, which still plays a large role in estimating a storm's strength from satellite images, was developed in the 1970s. So I treat the years before 1970 as a different, patchier record, and make every comparison of intensity within 1980 to {{meta.last|raw}}. Even then, most storms are measured from satellite images rather than by aircraft, and the methods have kept improving, which can itself create trends.</p></div>
+
+<h2><span class="n">03 · Where they form</span>A belt either side of the equator, never on it</h2>
+<p>The density layer on the map shows where the {{genesis.n|int}} storms that reached tropical storm strength from 1980 to {{meta.last|raw}} began. They form over warm water in two belts, mostly between 5 and 20 degrees from the equator: {{genesis.within_10_25_pct|pc}} of them start there, and only {{genesis.eq5_pct|f1}}% within 5 degrees of the equator, where the Earth's spin is too weak to wind them up. {{genesis.nh_pct|pc}} form north of the equator. The busiest nursery on Earth is the sea off southern Mexico, where the 2.5 degree square around {{genesis.top.0.lat|f1}}°N, {{k.gen_lon_w|f1}}°W has spawned {{genesis.top.0.per_dec|f1}} storms a decade; the western Pacific has the largest area of busy water. The South Atlantic almost never makes one: {{genesis.sa_n|int}} in {{counts.sat_years|int}} seasons.</p>
+<div class="controls"><button class="btn" id="showGen">Show where they form on the map</button></div>
+<div class="figure"><p class="fig-h">When each basin's storms form</p><p class="fig-sub">Storms reaching tropical storm strength, 1980 to {{meta.last|raw}}, by basin and the month they formed. Hover a cell.</p>
+<div class="chart" id="monChart"></div></div>
+<p>The seasons run like clockwork. Atlantic storms peak in September, eastern Pacific ones in August, typhoons in August, South Indian and South Pacific cyclones in January to March. The North Indian Ocean has two seasons, before and after the monsoon, with peaks in May and November, which is why the Bay of Bengal is so often hit in late autumn.</p>
+
+<h2><span class="n">04 · Where they hit</span>China gets the most, the Philippines the worst</h2>
+<p>I counted a landfall wherever a track crosses from sea onto land at tropical storm strength or more. From 1980 to {{meta.last|raw}}, {{landfall.landfall_pct|pc}} of all tropical storms made landfall somewhere, and {{landfall.hu_landfall_pct|pc}} of hurricanes and typhoons came ashore at hurricane strength, in {{landfall.n_countries|int}} countries and territories. <b>China</b> is hit by the most storms: {{landfall.top.0.ts|int}} in {{counts.sat_years|int}} seasons, about {{landfall.top.0.ts_py|f1}} a year. But <b>the Philippines</b> takes the hardest blows: {{landfall.top_hu.0.hu|int}} storms came ashore there at typhoon strength and {{landfall.top_hu.0.mj|int}} at Category 3 or more, both the most of any country, because typhoons reach its eastern islands at their peak, straight off the warm open Pacific. The United States had {{landfall.top.5.ts|int}} landfalls, {{landfall.top.5.hu|int}} at hurricane strength.</p>
+<div class="figure"><p class="fig-h">Countries hit most often, 1980 to {{meta.last|raw}}</p><p class="fig-sub">Storms making landfall at least once in the country, by strength at landfall. A storm counts once per country. Click a row to see its landfalls on the map.</p>
+<div class="controls"><div class="scrollrow" id="lfRow"><span class="ctl-l">Sort by</span><button class="btn" data-s="ts" aria-pressed="true">All landfalls</button><button class="btn" data-s="hu" aria-pressed="false">Hurricane strength</button><button class="btn" data-s="mj" aria-pressed="false">Category 3 or more</button></div></div>
+<div class="tablebox"><table class="tbl" id="lfTable"></table></div></div>
+<p>Down at the level of coasts, the most-hit place on Earth is <b>Guangdong</b>, China's southern coast around Hong Kong and Macau, with {{landfall.top_regions.0.ts|int}} landfalls since 1980, followed by {{landfall.top_regions.1.region|raw}} ({{landfall.top_regions.1.ts|int}}), {{landfall.top_regions.2.region|raw}} ({{landfall.top_regions.2.ts|int}}), {{landfall.top_regions.3.region|raw}} ({{landfall.top_regions.3.ts|int}}) and {{landfall.top_regions.4.region|raw}} ({{landfall.top_regions.4.ts|int}}). Counting only landfalls at Category 3 or more, the leaders are {{landfall.top_regions_mj.0.region|raw}} ({{landfall.top_regions_mj.0.mj|int}}), {{landfall.top_regions_mj.1.region|raw}} ({{landfall.top_regions_mj.1.mj|int}}) and {{landfall.top_regions_mj.2.region|raw}}, at the northern tip of Luzon ({{landfall.top_regions_mj.2.mj|int}}).</p>
+<div class="figure"><p class="fig-h">The most-hit coasts: states, provinces and prefectures</p><p class="fig-sub">Storms making landfall at tropical storm strength or more, 1980 to {{meta.last|raw}}. Click a row to zoom the map there.</p>
+<div class="tablebox"><table class="tbl" id="rgTable"></table></div></div>
+<p>A caution on strength at landfall: I interpolate the wind between six-hourly positions, so a storm that peaks right at the coast can read a category lower than its official landfall. Andrew in 1992, officially a Category 5 landfall in Florida, reads here as Category 4. Over the whole record, with its gaps, the United States has the most counted landfalls ({{landfall.all_top.0.ts|int}}), simply because its coast has been watched longest.</p>
+
+<h2><span class="n">05 · The strongest</span>Patricia, Tip and a crowd of typhoons</h2>
+<p>The highest 1-minute wind in the archive is {{strongest.wind.0.kt|int}} knots ({{strongest.wind.0.mph|int}} mph, {{strongest.wind.0.kmh|int}} km/h), shared by Hurricane Patricia off Mexico in 2015 and Typhoon Nancy in 1961. Patricia's is usually given as the highest sustained wind ever recorded. Nancy's comes from the early years of aircraft reconnaissance in the Pacific, and {{strongest.n_top20_5060|int}} of the top 20 are typhoons of the 1950s and 1960s, whose winds were estimated in ways that are hard to compare with today's. The lowest pressure belongs to Typhoon Tip in 1979, {{strongest.pressure.0.pres|int}} hectopascals. {{strongest.n_c5|int}} storms reached Category 5, {{strongest.c5_by_basin.WP|int}} of them typhoons in the western Pacific.</p>
+<div class="figure"><p class="fig-h">The strongest storms on record</p><p class="fig-sub">By peak 1-minute sustained wind (US agencies), then lowest pressure. Click a row to see the track.</p>
+<div class="controls"><div class="scrollrow" id="stRow"><span class="ctl-l">Show</span><button class="btn" data-s="all" aria-pressed="true">All years</button><button class="btn" data-s="sat" aria-pressed="false">Since 1980</button></div></div>
+<div class="tablebox"><table class="tbl" id="stTable"></table></div></div>
+<p>The strongest landfalls, by my interpolated winds, are Haiyan on Leyte in the Philippines in 2013 ({{landfall.strongest.0.kt|int}} knots), Meranti on Batanes in 2016 and Dorian on the Abaco Islands of the Bahamas in 2019.</p>
+
+<h2><span class="n">06 · Getting stronger?</span>More of them reach Category 4 and 5, with caveats</h2>
+<p>If storms are getting stronger, a larger share of them should reach the top of the scale. Here I use only the 1-minute winds of the US agencies, so every storm is measured the same way, and only storms that reached tropical storm strength. In the 1980s, {{shares.global.0.s4|f1}}% of them reached Category 4 or 5. In the 1990s it was {{shares.global.1.s4|f1}}%, in the 2000s {{shares.global.2.s4|f1}}%, in the 2010s {{shares.global.3.s4|f1}}%, and so far in the 2020s {{shares.global.4.s4|f1}}%. Split the satellite era in half, and {{shares.halves.s4_1|f1}}% of storms reached Category 4 or more in {{shares.halves.h1|raw}}, against {{shares.halves.s4_2|f1}}% in {{shares.halves.h2|raw}}: a difference that chance would rarely produce (p {{shares.halves.p4|p3}}). The number of Category 4 and 5 storms a year has risen by {{counts.sat_c4_trend.per_dec|f1}} a decade (95% interval {{counts.sat_c4_trend.lo|f1}} to {{counts.sat_c4_trend.hi|f1}}).</p>
+<div class="figure"><p class="fig-h">Share of storms reaching Category 3+ and Category 4+, by decade</p><p class="fig-sub">Storms reaching 34 knots on the US agencies' 1-minute wind. Pale bars: fewer than 80% of the decade's systems have such a wind, or before 1970. The 2020s are 2020 to {{meta.last|raw}}. Hover a bar.</p>
+<div class="controls"><div class="scrollrow" id="shRow"><span class="ctl-l">Where</span></div></div>
+<div class="chart" id="shChart"></div><div class="legend" id="shLegend"></div></div>
+<p>For Category 3 and above the picture is weaker: {{shares.halves.s3_1|f1}}% against {{shares.halves.s3_2|f1}}% (p {{shares.halves.p3|f2}}), and the year-by-year trend, {{shares.halves.trend3.per_dec|sf1}} percentage points a decade, could be zero (95% interval {{shares.halves.trend3.lo|sf1}} to {{shares.halves.trend3.hi|sf1}}). Most of the rise happened between the 1980s and the 1990s, the years when satellite methods were maturing, and the share has moved little since. By basin, the clearest rises in Category 4+ are in the South Pacific ({{shares.halves.basins.SP.s4_1|pc}} to {{shares.halves.basins.SP.s4_2|pc}}), the western North Pacific ({{shares.halves.basins.WP.s4_1|pc}} to {{shares.halves.basins.WP.s4_2|pc}}) and the South Indian Ocean ({{shares.halves.basins.SI.s4_1|pc}} to {{shares.halves.basins.SI.s4_2|pc}}); the North Atlantic ({{shares.halves.basins.NA.s4_1|pc}} to {{shares.halves.basins.NA.s4_2|pc}}) and the eastern Pacific show no clear change. The total energy of each season, measured as accumulated cyclone energy, has no clear trend at all ({{ace.trend.per_dec|sf1}} a decade, 95% interval {{ace.trend.lo|sf1}} to {{ace.trend.hi|sf1}}).</p>
+<div class="verdict"><h3>So, are they getting stronger?</h3><p>Somewhat, in the one way the record can measure fairly. Since 1980 the number of storms has not changed, but a larger share of them reaches Category 4 or 5: about one in {{shares.halves.inv4_1|int}} in the first half of the satellite era, one in {{shares.halves.inv4_2|int}} in the second. Wikipedia, summarising a 2020 study by Kossin and colleagues, reports a global increase from 1979 to 2017 in the proportion of storms reaching Category 3 or more. In this raw best-track record the rise is clear for Category 4 and above but not for Category 3 and above, and I cannot rule out that some of it comes from better measurement. Nothing before 1970 can be compared fairly. The record does not show more storms, or that every season is getting worse.</p></div>
+
+<h2><span class="n">07 · Moving poleward</span>Storms now peak further from the equator</h2>
+<p>A second, subtler change is where storms reach their peak. In the Northern Hemisphere, the average latitude of each storm's lifetime peak wind has moved poleward by {{lmi.N_trend.km_per_dec|int}} km a decade since 1980 (95% interval {{lmi.N_trend.km_lo|int}} to {{lmi.N_trend.km_hi|int}} km), in the Southern Hemisphere by {{lmi.S_trend.km_per_dec|int}} km a decade ({{lmi.S_trend.km_lo|int}} to {{lmi.S_trend.km_hi|int}} km). Across both, that is about {{k.lmi_g_total_km|int}} km over {{counts.sat_years|int}} seasons. It is driven by the western Pacific, where typhoons now peak {{lmi.basins.WP.km_per_dec|int}} km a decade further north, closer to Japan, Korea and China. In the North Atlantic the average has moved the other way, though not clearly ({{lmi.basins.NA.km_per_dec|int}} km a decade, interval {{lmi.basins.NA.km_lo|int}} to {{lmi.basins.NA.km_hi|int}}).</p>
+<div class="figure"><p class="fig-h">Average latitude of each storm's peak, by season</p><p class="fig-sub">Storms reaching 34 knots, distance from the equator of the point of highest 1-minute wind, mean per season, with straight-line trends. Hover a point.</p>
+<div class="chart" id="lmiChart"></div><div class="legend" id="lmiLegend"></div></div>
+<div class="figure"><p class="fig-h">The poleward shift by basin</p><p class="fig-sub">Trend in the latitude of peak intensity, km a decade, 1980 to {{meta.last|raw}}, with 95% bootstrap intervals. Positive is towards the pole.</p>
+<div class="chart" id="lbChart"></div></div>
+<p class="pull">The number of storms has not changed since 1980. Where they peak, and how many reach the top of the scale, has.</p>
+
+<h2><span class="n">08 · How I did this</span>Methods and caveats</h2>
+<p><b>Data.</b> IBTrACS version 4, revision v04r01, from NOAA's National Centers for Environmental Information, reduced to the synoptic six-hourly positions (00, 06, 12 and 18 UTC): {{meta.n_points|int}} positions of {{meta.n_storms|int}} storms, keeping the main tracks and the provisional tracks of recent storms and leaving out the short "spur" tracks that IBTrACS uses for alternative positions. Seasons follow IBTrACS: a Southern Hemisphere season is named after the year it ends. Analyses use the complete seasons {{meta.first|raw}} to {{meta.last|raw}}; 2026 is on the map only.</p>
+<p><b>Strength.</b> The Saffir-Simpson scale is defined on the 1-minute sustained wind, so intensity is the wind of the US agencies (the National Hurricane Center, the Central Pacific Hurricane Center and the Joint Typhoon Warning Center), which IBTrACS gives as USA_WIND. Where it is missing, the map uses the wind of the agency responsible for the basin; many of those are 10-minute averages, which read lower. Shares of Category 3+ and 4+, the latitude of peak intensity and accumulated cyclone energy use the US 1-minute wind only. Storms are counted in the basin where they formed.</p>
+<p><b>Landfall.</b> Each six-hourly segment is a straight line, intersected with every land polygon of Natural Earth's 1:10m countries; a landfall is where a segment enters land from the sea while the storm was not extratropical, with the wind interpolated along the segment. Crossings of land borders do not count. The state or province is the Natural Earth unit that contains the landfall. Straight segments can cut corners or miss small islands, and interpolated winds are approximate.</p>
+<p><b>Trends.</b> Trends are least-squares lines through the seasonal values, with 95% intervals from 4,000 bootstrap resamples of seasons; the comparison of halves uses a two-proportion test. Nothing here separates natural variability, such as El Niño or the Atlantic's multidecadal swings, from long-term change, and nothing here attributes anything to climate change. Before about 1970 the record misses many storms, especially weak and short-lived ones out at sea, and outside the Atlantic it has no winds before the 1940s or later, so long-run trends in the record say as much about observation as about storms.</p>
+<details><summary>Sources and licences</summary>
+<ul>
+<li>Knapp, K. R., Kruk, M. C., Levinson, D. H., Diamond, H. J. and Neumann, C. J. (2010) The International Best Track Archive for Climate Stewardship (IBTrACS): unifying tropical cyclone best track data. Bulletin of the American Meteorological Society 91, 363 to 376. Data: Gahtan, J., Knapp, K. R., Schreck, C. J., Diamond, H. J., Kossin, J. P. and Kruk, M. C. (2024) IBTrACS Project, Version 4r01, NOAA National Centers for Environmental Information. NOAA data, no copyright restrictions; retrieved {{meta.retrieved|raw}}.</li>
+<li>Wikipedia contributors, "Tropical cyclone" and "Saffir-Simpson scale" (https://en.wikipedia.org/), CC BY-SA 4.0: the category thresholds and background on satellites, reconnaissance and research (Kossin, Knapp, Olander and Velden 2020; Kossin, Emanuel and Vecchi 2014).</li>
+<li>Natural Earth countries, states and provinces, and populated places (public domain). Base map tiles © Esri.</li>
+</ul></details>
+
+<div class="cta"><a class="p" href="https://doi.org/10.5281/zenodo.23858051">Read the paper</a><a href="https://github.com/Tristan-Hotham/hurricane-tracks">Data and code</a><a href="https://blog.tristanhotham.com/2026/10/31/hurricane-tracks/">Blog post</a></div>
+
+<footer>
+<p>Dr Tristan Hotham, Independent researcher. ORCID <a href="https://orcid.org/0000-0003-4931-9349">0000-0003-4931-9349</a>.</p>
+<p>Cite as: Hotham, T. (2026) Every storm since 1851: where tropical cyclones form, where they hit, and whether they are getting stronger. Zenodo. <a href="https://doi.org/10.5281/zenodo.23858051">https://doi.org/10.5281/zenodo.23858051</a></p>
+<p>Data: NOAA NCEI IBTrACS v04r01 (Knapp et al. 2010), NOAA data with no copyright restrictions; Natural Earth. Licence: text, figures and derived data CC BY 4.0, code MIT.</p>
+<p>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</p>
+</footer>
+</div>
+<div class="tip" id="tip"></div>
+<button class="btn theme" id="theme" aria-label="Toggle dark mode">◐</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const R = /*RESULTS*/;
+const SITE = /*SITE*/;
+const fmt = n => n == null || n === "" ? "n/a" : Math.round(n).toLocaleString("en-GB");
+const f1 = n => n == null ? "n/a" : (+n).toFixed(1);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const tip = document.getElementById("tip");
+function showTip(h, x, y) { tip.innerHTML = h; tip.style.display = "block"; const w = tip.offsetWidth; x = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x)); tip.style.left = x + scrollX + "px"; tip.style.top = y + scrollY + "px"; }
+function hideTip() { tip.style.display = "none"; }
+document.addEventListener("click", hideTip);
+const NS = "http://www.w3.org/2000/svg";
+const el = (t, a, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const lbl = (svg, x, y, s, cls = "lab", anchor = "start") => { const t = el("text", { x, y, class: cls, "text-anchor": anchor }, svg); t.textContent = s; return t; };
+const redraws = [];
+function resp(box, render) { let last = 0; const go = force => { const w = Math.max(280, Math.round(box.clientWidth)); if (!force && Math.abs(w - last) < 4) return; last = w; box.innerHTML = ""; render(w, w < 560); }; new ResizeObserver(() => go()).observe(box); go(); redraws.push(() => go(true)); }
+const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const small = () => innerWidth < 900;
+const CATS = SITE.cats, BAS = SITE.basins, BN = Object.fromEntries(BAS.map(b => [b[0], b[1]])), BC = Object.fromEntries(BAS.map(b => [b[0], b[2]]));
+const ccol = c => c < 0 ? (isDark() ? "#6E685F" : SITE.unk) : (isDark() ? SITE.col_dark : SITE.col)[c];
+const catName = c => c < 0 ? "wind not recorded" : CATS[c][0];
+const kt = k => k == null ? "not recorded" : `${k} kt (${5 * Math.round(k * 1.15078 / 5)} mph, ${5 * Math.round(k * 1.852 / 5)} km/h)`;
+const pcat = c => `<span class="pcat" style="background:${ccol(c)};color:${c >= 2 && c <= 3 ? "#1C2027" : "#fff"}">${esc(catName(c))}</span>`;
+const LAST = SITE.last, SAT0 = SITE.sat0, MAXS = SITE.maxseason;
+
+/* hero mark: a spiral of category colours */
+(function () {
+  const g = document.getElementById("heroMark");
+  const cols = SITE.col.slice(1);
+  for (let k = 0; k < 2; k++) cols.forEach((c, i) => { const a0 = k * Math.PI + i * 0.46, r0 = 10 + i * 7.5, r1 = 14 + i * 7.5;
+    const p = []; for (let t = 0; t <= 1.0001; t += .1) { const a = a0 + t * 0.5, r = r0 + (r1 - r0) * t; p.push([60 + r * Math.cos(a), 60 + r * Math.sin(a)]); }
+    el("path", { d: "M" + p.map(q => q[0].toFixed(1) + " " + q[1].toFixed(1)).join(" L"), fill: "none", stroke: c, "stroke-width": 5 + i * .6, "stroke-linecap": "round" }, g); });
+  el("circle", { cx: 60, cy: 60, r: 5.5, fill: "none", stroke: "currentColor", "stroke-width": 2.4 }, g);
+})();
+
+/* ---------- storms per year ---------- */
+let PYK = "ts", PYR = "all";
+function pyChart() {
+  const box = document.getElementById("pyChart");
+  resp(box, (W, sm) => {
+    const H = sm ? 250 : 300, m = { l: 34, r: 8, t: 14, b: 26 };
+    const yrs = PY.years.filter(y => PYR === "all" || y >= SAT0), n = yrs.length;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Stacked bar chart of storms per season by basin" }, box);
+    const tot = yrs.map(y => BAS.reduce((s, b) => s + PY[b[0] + "_" + PYK][y - PY.years[0]], 0));
+    const step = PYK === "all" ? 25 : PYK === "ts" ? 20 : 10, mx = Math.ceil(Math.max(...tot) / step) * step;
+    const x = i => m.l + i * (W - m.l - m.r) / n, bw = Math.max(1, (W - m.l - m.r) / n - (n > 100 ? 0.4 : 1.5)), y = v => H - m.b - v / mx * (H - m.t - m.b);
+    for (let v = 0; v <= mx; v += step) { el("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: css("--rule") }, svg); lbl(svg, m.l - 6, y(v) + 4, v, "lab s m", "end"); }
+    const i70 = yrs.indexOf(1970);
+    if (i70 > 0) { el("rect", { x: m.l, y: m.t, width: x(i70) - m.l, height: H - m.t - m.b, fill: css("--pre"), opacity: .16 }, svg); lbl(svg, m.l + 6, m.t + 12, "before satellites: storms missed", "lab s m"); }
+    yrs.forEach((yr, i) => { let acc = 0; BAS.forEach(b => { const v = PY[b[0] + "_" + PYK][yr - PY.years[0]]; if (!v) return; el("rect", { x: x(i), y: y(acc + v), width: bw, height: y(acc) - y(acc + v), fill: b[2] }, svg); acc += v; });
+      const hit = el("rect", { x: x(i), y: m.t, width: bw + 1, height: H - m.t - m.b, fill: "transparent" }, svg);
+      hit.addEventListener("mousemove", e => showTip(`<b>${yr}</b>: ${tot[i]}<br>${BAS.filter(b => PY[b[0] + "_" + PYK][yr - PY.years[0]]).map(b => `${esc(b[1])}: ${PY[b[0] + "_" + PYK][yr - PY.years[0]]}`).join("<br>")}`, e.clientX, e.clientY)); hit.addEventListener("mouseleave", hideTip);
+      const every = PYR === "all" ? (sm ? 50 : 25) : (sm ? 10 : 5); if (yr % every === 0) lbl(svg, x(i) + bw / 2, H - 8, yr, "lab s m", "middle"); });
+  });
+  document.getElementById("pyLegend").innerHTML = BAS.map(b => `<span><i class="sq" style="background:${b[2]}"></i>${esc(b[1])}</span>`).join("");
+}
+const PY = R.per_year;
+document.querySelectorAll("#pyRow .btn").forEach(b => b.onclick = () => { PYK = b.dataset.k; document.querySelectorAll("#pyRow .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); redrawAll(); });
+document.querySelectorAll("#pyRange .btn").forEach(b => b.onclick = () => { PYR = b.dataset.r; document.querySelectorAll("#pyRange .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); redrawAll(); });
+function redrawAll() { redraws.forEach(f => f()); }
+
+/* ---------- genesis by month ---------- */
+function monChart() {
+  const box = document.getElementById("monChart"), M = R.genesis.by_month, ny = R.counts.sat_years;
+  resp(box, (W, sm) => {
+    const bs = BAS.filter(b => b[0] !== "SA"), lw = sm ? 70 : 230, ch = sm ? 30 : 34, H = 22 + bs.length * ch + 6;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Heat map of storm formation by basin and month" }, box);
+    const cw = (W - lw - 4) / 12, mx = Math.max(...bs.flatMap(b => M[b[0]]));
+    "JFMAMJJASOND".split("").forEach((mn, j) => lbl(svg, lw + j * cw + cw / 2, 14, sm ? mn : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][j], "lab s m", "middle"));
+    const SH = { NA: "N Atlantic", EP: "E Pacific", WP: "W Pacific", NI: "N Indian", SI: "S Indian", SP: "S Pacific" };
+    bs.forEach((b, i) => { const y0 = 22 + i * ch; lbl(svg, lw - 8, y0 + ch / 2 + 4, sm ? SH[b[0]] : b[1], "lab s", "end");
+      M[b[0]].forEach((v, j) => { const t = v / mx; const r = el("rect", { x: lw + j * cw + 1, y: y0 + 1, width: cw - 2, height: ch - 2, rx: 2, fill: b[2], opacity: v ? .1 + .9 * Math.pow(t, .7) : .04 }, svg);
+        if (v && !sm) lbl(svg, lw + j * cw + cw / 2, y0 + ch / 2 + 4, v, "lab s", "middle").setAttribute("style", `fill:${t > .45 ? "#fff" : css("--fg")}`);
+        r.addEventListener("mousemove", e => showTip(`<b>${esc(b[1])}, ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][j]}</b><br>${v} storms formed, 1980 to ${LAST}<br>${(v / ny).toFixed(1)} a season`, e.clientX, e.clientY)); r.addEventListener("mouseleave", hideTip); }); });
+  });
+}
+
+/* ---------- landfall tables ---------- */
+let LFS = "ts";
+function lfTable() {
+  const t = document.getElementById("lfTable"), rows = R.landfall.top.slice().sort((a, b) => b[LFS] - a[LFS] || b.ts - a.ts).slice(0, 30), mx = Math.max(...rows.map(r => r.ts));
+  const bar = r => `<span class="bar" style="width:${(r.ts - r.hu) / mx * 90}px;background:${ccol(1)}"></span><span class="bar" style="width:${(r.hu - r.mj) / mx * 90}px;background:${ccol(2)}"></span><span class="bar" style="width:${r.mj / mx * 90}px;background:${ccol(5)}"></span>`;
+  t.innerHTML = `<tr><th>Country</th><th class="r">All</th><th class="r">Hurricane</th><th class="r">Cat 3+</th><th class="r">Cat 5</th><th>${small() ? "" : "Share"}</th></tr>` + rows.map((r, i) => `<tr data-i="${i}"><td><b>${esc(r.name)}</b></td><td class="r">${r.ts}</td><td class="r">${r.hu}</td><td class="r">${r.mj}</td><td class="r">${r.c5}</td><td>${small() ? "" : bar(r)}</td></tr>`).join("");
+  t.querySelectorAll("tr[data-i]").forEach(tr => tr.onclick = () => goCountry(rows[+tr.dataset.i].name));
+}
+document.querySelectorAll("#lfRow .btn").forEach(b => b.onclick = () => { LFS = b.dataset.s; document.querySelectorAll("#lfRow .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); lfTable(); });
+function rgTable() {
+  const t = document.getElementById("rgTable"), rows = R.landfall.top_regions.slice(0, 25);
+  t.innerHTML = `<tr><th>Coast</th><th class="r">All</th><th class="r">Hurricane</th><th class="r">Cat 3+</th><th class="r">A year</th></tr>` + rows.map((r, i) => `<tr data-i="${i}"><td><b>${esc(r.region)}</b><br><small>${esc(r.name)}</small></td><td class="r">${r.ts}</td><td class="r">${r.hu}</td><td class="r">${r.mj}</td><td class="r">${f1(r.ts_py)}</td></tr>`).join("");
+  t.querySelectorAll("tr[data-i]").forEach(tr => tr.onclick = () => goRegion(rows[+tr.dataset.i]));
+}
+let STS = "all";
+function stTable() {
+  const t = document.getElementById("stTable"), rows = (STS === "all" ? R.strongest.wind : R.strongest.wind_sat).slice(0, 25);
+  t.innerHTML = `<tr><th>Storm</th><th class="r">Peak wind</th><th class="r">hPa</th><th>Countries hit</th></tr>` + rows.map((r, i) => `<tr data-i="${i}"><td><b>${esc(r.name || "Unnamed")}</b> ${r.season}<br><small>${esc(BN[r.basin])}</small></td><td class="r">${r.kt} kt<br><small>${r.mph} mph, ${r.kmh} km/h</small></td><td class="r">${r.pres ?? ""}</td><td><small>${esc(r.hits.join(", ") || "none: stayed at sea")}</small></td></tr>`).join("");
+  t.querySelectorAll("tr[data-i]").forEach(tr => tr.onclick = () => bySid(rows[+tr.dataset.i].sid));
+}
+document.querySelectorAll("#stRow .btn").forEach(b => b.onclick = () => { STS = b.dataset.s; document.querySelectorAll("#stRow .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); stTable(); });
+
+/* ---------- shares by decade ---------- */
+let SHB = "global";
+(function () { const row = document.getElementById("shRow");
+  [["global", "World, since 1980"], ...BAS.filter(b => b[0] !== "SA").map(b => [b[0], b[1]])].forEach(([k, n], i) => { const x = document.createElement("button"); x.className = "btn"; x.textContent = n; x.setAttribute("aria-pressed", i === 0); x.onclick = () => { SHB = k; row.querySelectorAll(".btn").forEach(y => y.setAttribute("aria-pressed", y === x)); redrawAll(); }; row.appendChild(x); }); })();
+function shChart() {
+  const box = document.getElementById("shChart");
+  resp(box, (W, sm) => {
+    const rows = SHB === "global" ? R.shares.global.map(r => ({ ...r, cov: 100 })) : R.shares.basins[SHB];
+    const H = sm ? 250 : 290, m = { l: 34, r: 8, t: 14, b: 42 }, n = rows.length;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Grouped bars of the share of storms reaching Category 3 and 4 by decade" }, box);
+    const mx = Math.max(40, Math.ceil(Math.max(...rows.map(r => r.s3)) / 10) * 10), y = v => H - m.b - v / mx * (H - m.t - m.b);
+    for (let v = 0; v <= mx; v += 10) { el("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: css("--rule") }, svg); lbl(svg, m.l - 6, y(v) + 4, v + "%", "lab s m", "end"); }
+    const gw = (W - m.l - m.r) / n, bw = Math.min(34, gw * .36);
+    rows.forEach((r, i) => { const x0 = m.l + i * gw + gw / 2, pale = r.cov < 80 || r.dec < 1970;
+      [["s3", 4, -1], ["s4", 5, 0]].forEach(([k, c, o]) => { const v = r[k]; el("rect", { x: x0 + o * bw - (o ? 1 : -1), y: y(v), width: bw, height: y(0) - y(v), fill: ccol(c), opacity: pale ? .3 : 1 }, svg);
+        if (!sm || n <= 9) lbl(svg, x0 + o * bw - (o ? 1 : -1) + bw / 2, y(v) - 4, Math.round(v), "lab s" + (pale ? " m" : ""), "middle"); });
+      lbl(svg, x0, H - m.b + 15, (sm && n > 8 ? "'" + String(r.dec).slice(2) : r.dec + "s"), "lab s m", "middle");
+      if (!sm || n <= 8) lbl(svg, x0, H - m.b + 29, "n " + r.n, "lab s m", "middle");
+      const hit = el("rect", { x: x0 - gw / 2, y: m.t, width: gw, height: H - m.t - m.b, fill: "transparent" }, svg);
+      hit.addEventListener("mousemove", e => showTip(`<b>${r.dec}s</b>: ${r.n} storms of tropical storm strength<br>Category 3+: ${r.c3} (${f1(r.s3)}%)<br>Category 4+: ${r.c4} (${f1(r.s4)}%)<br>Category 5: ${r.c5}${r.cov < 100 ? `<br>${Math.round(r.cov)}% of systems have a 1-minute wind` : ""}`, e.clientX, e.clientY)); hit.addEventListener("mouseleave", hideTip); });
+  });
+  document.getElementById("shLegend").innerHTML = `<span><i class="sq" style="background:${ccol(4)}"></i>Category 3 or more</span><span><i class="sq" style="background:${ccol(5)}"></i>Category 4 or more</span><span><i class="sq" style="background:${ccol(5)};opacity:.3"></i>patchy record</span>`;
+}
+
+/* ---------- latitude of peak intensity ---------- */
+function lmiChart() {
+  const box = document.getElementById("lmiChart"), L_ = R.lmi;
+  resp(box, (W, sm) => {
+    const H = sm ? 240 : 280, m = { l: 36, r: 10, t: 12, b: 26 }, yrs = L_.years, n = yrs.length;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Line chart of the mean latitude of peak intensity by hemisphere" }, box);
+    const y0 = 14, y1 = 24, X = yr => m.l + (yr - yrs[0]) / (n - 1) * (W - m.l - m.r), Y = v => H - m.b - (v - y0) / (y1 - y0) * (H - m.t - m.b);
+    for (let v = y0; v <= y1; v += 2) { el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css("--rule") }, svg); lbl(svg, m.l - 6, Y(v) + 4, v + "°", "lab s m", "end"); }
+    yrs.forEach(yr => { if (yr % (sm ? 10 : 5) === 0) lbl(svg, X(yr), H - 8, yr, "lab s m", "middle"); });
+    [["N", css("--hot"), "Northern Hemisphere"], ["S", css("--cool"), "Southern Hemisphere"]].forEach(([h, c]) => {
+      const v = L_[h]; el("path", { d: v.map((q, i) => `${i ? "L" : "M"}${X(yrs[i]).toFixed(1)} ${Y(q).toFixed(1)}`).join(" "), fill: "none", stroke: c, "stroke-width": 1.6, opacity: .75 }, svg);
+      const mx_ = yrs.reduce((s, q) => s + q, 0) / n, my = v.reduce((s, q) => s + q, 0) / n, sl = L_[h + "_trend"].per_dec / 10;
+      el("line", { x1: X(yrs[0]), x2: X(yrs[n - 1]), y1: Y(my + sl * (yrs[0] - mx_)), y2: Y(my + sl * (yrs[n - 1] - mx_)), stroke: c, "stroke-width": 2.6, "stroke-dasharray": "6 4" }, svg);
+      v.forEach((q, i) => { const d = el("circle", { cx: X(yrs[i]), cy: Y(q), r: 3, fill: c }, svg); d.addEventListener("mousemove", e => showTip(`<b>${yrs[i]}</b><br>${h === "N" ? "Northern" : "Southern"} Hemisphere: ${q.toFixed(1)}° from the equator`, e.clientX, e.clientY)); d.addEventListener("mouseleave", hideTip); }); });
+  });
+  document.getElementById("lmiLegend").innerHTML = `<span><i class="ln" style="background:var(--hot)"></i>Northern Hemisphere (${Math.round(R.lmi.N_trend.km_per_dec)} km a decade)</span><span><i class="ln" style="background:var(--cool)"></i>Southern Hemisphere (${Math.round(R.lmi.S_trend.km_per_dec)} km a decade)</span><span>dashed: trend</span>`;
+}
+function lbChart() {
+  const box = document.getElementById("lbChart");
+  resp(box, (W, sm) => {
+    const rows = [["Both hemispheres", R.lmi.G_trend], ["Northern Hemisphere", R.lmi.N_trend], ["Southern Hemisphere", R.lmi.S_trend], ...BAS.filter(b => b[0] !== "SA").map(b => [b[1], R.lmi.basins[b[0]], b[2]])];
+    const rh = 26, m = { l: sm ? 150 : 250, r: 14, t: 8, b: 28 }, H = m.t + m.b + rows.length * rh;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Trend in latitude of peak intensity by basin with intervals" }, box);
+    const a = -120, b = 120, X = v => m.l + (v - a) / (b - a) * (W - m.l - m.r);
+    [-100, -50, 0, 50, 100].forEach(v => { el("line", { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: v ? css("--rule") : css("--fg"), "stroke-width": v ? 1 : 1.3 }, svg); lbl(svg, X(v), H - m.b + 16, (v > 0 ? "+" : "") + v, "lab s m", "middle"); });
+    rows.forEach(([nm, t, c], i) => { const y = m.t + i * rh + rh / 2, col = c || (i === 0 ? css("--fg") : i === 1 ? css("--hot") : css("--cool"));
+      lbl(svg, m.l - 8, y + 4, sm ? nm.replace("Eastern and central North Pacific", "E and C N Pacific").replace("Western North Pacific", "W N Pacific").replace(" Hemisphere", " Hem.") : nm, "lab s" + (i < 3 ? " b" : ""), "end");
+      el("line", { x1: X(Math.max(a, t.km_lo)), x2: X(Math.min(b, t.km_hi)), y1: y, y2: y, stroke: col, "stroke-width": 3, "stroke-linecap": "round", opacity: t.km_lo > 0 || t.km_hi < 0 ? .95 : .45 }, svg);
+      const d = el("circle", { cx: X(t.km_per_dec), cy: y, r: 5, fill: col, stroke: css("--card"), "stroke-width": 1.2 }, svg);
+      const hit = el("rect", { x: 0, y: y - rh / 2, width: W, height: rh, fill: "transparent" }, svg);
+      hit.addEventListener("mousemove", e => showTip(`<b>${esc(nm)}</b><br>${Math.round(t.km_per_dec)} km a decade<br>95%: ${Math.round(t.km_lo)} to ${Math.round(t.km_hi)} km`, e.clientX, e.clientY)); hit.addEventListener("mouseleave", hideTip); });
+    lbl(svg, X(110), m.t + 10, "poleward →", "lab s m", "end");
+  });
+}
+
+/* ---------- the map ---------- */
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const ESRI_ATT = 'Tiles &copy; Esri, GEBCO, NOAA, National Geographic, Garmin, HERE, Geonames.org, and other contributors';
+const LYDEF = { base: "plain", hills: false, hillK: 40, labels: true, labelK: 70, names: false, nameLvl: 1, cnames: true, borders: true, tracks: true, width: 1, unk: true, lf: false, gen: false, genK: 85, births: false };
+const LY = { ...LYDEF };
+try { Object.assign(LY, JSON.parse(localStorage.getItem("hur_layers") || "{}")); } catch (e) {}
+const saveLY = () => { try { localStorage.setItem("hur_layers", JSON.stringify(LY)); } catch (e) {} };
+const HOME = () => innerWidth < 600 ? [[15, 170], 1] : small() ? [[15, 165], 1.5] : [[15, 160], 1.5];
+const map = L.map("map", { minZoom: 1, maxZoom: 11, zoomSnap: .5, worldCopyJump: false, maxBounds: [[-85, -540], [85, 540]] }).setView(...HOME());
+["hills:250", "gen:320", "lines:380", "labels:450", "trk:500", "names:620"].forEach(s => { const [n, z] = s.split(":"); map.createPane(n); map.getPane(n).style.zIndex = z; });
+["hills", "labels", "names", "gen", "trk"].forEach(n => map.getPane(n).style.pointerEvents = "none");
+let base = null, hills = null, labels = null; const names = L.layerGroup();
+const genLayer = L.layerGroup([-360, 0, 360].map(k => L.imageOverlay("data/genesis.png", [[-85.0511, -180 + k], [85.0511, 180 + k]], { pane: "gen", opacity: .7, interactive: false })));
+let COUNTRIES = null, CITIES = [], CN = {};
+const cLayer = L.geoJSON(null, { pane: "lines", style: () => ({ color: css("--border") || "#999", weight: LY.borders ? .6 : 0, fill: false, interactive: false }), interactive: false }).addTo(map);
+function setTiles() {
+  [base, labels, hills].forEach(l => { if (l) map.removeLayer(l); });
+  const t = isDark() ? "Dark" : "Light";
+  const url = LY.base === "ocean" ? ESRI + "Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}" : LY.base === "relief" ? ESRI + "World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}" : LY.base === "satellite" ? ESRI + "World_Imagery/MapServer/tile/{z}/{y}/{x}" : `${ESRI}Canvas/World_${t}_Gray_Base/MapServer/tile/{z}/{y}/{x}`;
+  base = L.tileLayer(url, { maxZoom: 16, maxNativeZoom: LY.base === "relief" || LY.base === "ocean" ? 13 : 16, attribution: ESRI_ATT }).addTo(map);
+  hills = L.tileLayer(ESRI + "Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, maxNativeZoom: 16, pane: "hills" });
+  labels = L.tileLayer(LY.base === "ocean" ? ESRI + "Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}" : `${ESRI}Canvas/World_${t}_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 16, maxNativeZoom: 13, pane: "labels" });
+  applyLayers();
+}
+function applyLayers() {
+  if (!base) return;
+  if (LY.hills) { hills.addTo(map); hills.setOpacity(Math.min(1, .1 + LY.hillK / 120)); } else map.removeLayer(hills);
+  if (LY.labels) { labels.addTo(map); labels.setOpacity(LY.labelK / 100); } else map.removeLayer(labels);
+  if (LY.names || LY.cnames) names.addTo(map); else map.removeLayer(names);
+  if (LY.gen) { genLayer.addTo(map); genLayer.eachLayer(l => l.setOpacity(LY.genK / 100)); } else map.removeLayer(genLayer);
+  cLayer.setStyle(() => ({ color: css("--border"), weight: LY.borders ? .6 : 0, fill: false }));
+  if (LY.lf && !LFP) loadLandfalls();
+  placeNames(); trk.draw(); legend();
+}
+function placeNames() {
+  names.clearLayers();
+  const z = map.getZoom(), bb = map.getBounds().pad(.05); const bxs = [];
+  if (LY.names && CITIES.length && z >= 3) {
+    const minPop = [[4, 3e6], [5, 1e6], [6, 4e5], [7, 1.5e5], [99, 1e5]].find(([zz]) => z < zz + (LY.nameLvl === 2 ? 1.5 : LY.nameLvl === 0 ? -1 : 0))[1] * (LY.nameLvl === 0 ? 2 : 1);
+    let n = 0;
+    for (const c of CITIES) {
+      if (c.pop < minPop || !bb.contains([c.lat, c.lon])) continue;
+      const pt = map.latLngToContainerPoint([c.lat, c.lon]), big = c.pop >= 5e6;
+      const bx = [pt.x - 4, pt.y - 8, pt.x + 10 + c.name.length * (big ? 6.9 : 6.3), pt.y + 7];
+      if (bxs.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue;
+      bxs.push(bx); L.marker([c.lat, c.lon], { pane: "names", interactive: false, keyboard: false, icon: L.divIcon({ className: "cityL" + (big ? "" : " s"), html: `<i></i>${esc(c.name)}`, iconSize: null, iconAnchor: [3, 6] }) }).addTo(names);
+      if (++n >= 90) break;
+    }
+  }
+  if (LY.cnames && COUNTRIES && z >= 3 && z < 7) {
+    COUNTRIES.features.forEach(f => { const g = CN.cpos[f.properties.iso]; if (!g) return; const nm = CN.cname[f.properties.iso] || "";
+      if (z < 4 && (g[2] || 0) < 2e7) return;
+      [-360, 0, 360].forEach(k => { if (!bb.contains([g[1], g[0] + k])) return; const pt = map.latLngToContainerPoint([g[1], g[0] + k]), w = nm.length * 7.2;
+        const bx = [pt.x - w / 2, pt.y - 7, pt.x + w / 2, pt.y + 7]; if (bxs.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) return; bxs.push(bx);
+        L.marker([g[1], g[0] + k], { pane: "names", interactive: false, keyboard: false, icon: L.divIcon({ className: "cntL", html: esc(nm), iconSize: [w, 14], iconAnchor: [w / 2, 7] }) }).addTo(names); }); });
+  }
+}
+map.on("moveend zoomend", placeNames);
+(function layerControl() {
+  const Ctl = L.Control.extend({ options: { position: "topright" }, onAdd() {
+    const d = L.DomUtil.create("div"); L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+    d.innerHTML = `<button class="lyrBtn" aria-expanded="false">Map layers</button>
+<div class="lyrPanel" hidden>
+ <div class="row"><label style="font-weight:600">Base map</label><div class="sub"><select data-k="base" aria-label="Base map"><option value="plain">Plain grey</option><option value="ocean">Sea depth (bathymetry)</option><option value="relief">Shaded relief</option><option value="satellite">Satellite</option></select></div></div>
+ <div class="row"><label><input type="checkbox" data-k="hills"> Hill shading</label><div class="sub"><span>strength</span><input type="range" data-k="hillK" min="10" max="100" step="5" aria-label="Hill shading strength"></div></div>
+ <div class="row"><label><input type="checkbox" data-k="labels"> Sea and place labels</label><div class="sub"><span>strength</span><input type="range" data-k="labelK" min="20" max="100" step="5" aria-label="Map label strength"></div></div>
+ <div class="row"><label><input type="checkbox" data-k="names"> Bold town names</label><div class="sub"><span>how many</span><select data-k="nameLvl" aria-label="How many town names"><option value="0">Biggest only</option><option value="1">Some</option><option value="2">Lots</option></select></div></div>
+ <div class="row"><label><input type="checkbox" data-k="cnames"> Country names</label></div>
+ <div class="row"><label><input type="checkbox" data-k="borders"> Borders</label></div>
+ <div class="hd">This study</div>
+ <div class="row"><label><input type="checkbox" data-k="tracks"> Storm tracks</label><div class="sub"><span>width</span><input type="range" data-k="width" min=".4" max="3" step=".1" aria-label="Track width"></div></div>
+ <div class="row"><label><input type="checkbox" data-k="unk"> Tracks with no wind recorded (grey)</label></div>
+ <div class="row"><label><input type="checkbox" data-k="lf"> Landfalls (dots by strength)</label></div>
+ <div class="row"><label><input type="checkbox" data-k="gen"> Where they form, 1980 to ${LAST}</label><div class="sub"><span>strength</span><input type="range" data-k="genK" min="10" max="100" step="5" aria-label="Formation density strength"></div></div>
+ <div class="row"><label><input type="checkbox" data-k="births"> Birth points of the storms shown</label></div>
+ <button class="reset">Reset layers</button>
+</div>`;
+    return d; } });
+  map.addControl(new Ctl());
+  const boxm = map.getContainer(), btn = boxm.querySelector(".lyrBtn"), pan = boxm.querySelector(".lyrPanel");
+  btn.onclick = () => { const o = pan.hidden; pan.hidden = !o; btn.setAttribute("aria-expanded", o); };
+  const sync = () => pan.querySelectorAll("[data-k]").forEach(i => { const k = i.dataset.k; if (i.type === "checkbox") i.checked = LY[k]; else i.value = LY[k]; });
+  pan.querySelectorAll("[data-k]").forEach(i => i.addEventListener(i.type === "range" ? "input" : "change", () => {
+    const k = i.dataset.k; LY[k] = i.type === "checkbox" ? i.checked : (k === "base" ? i.value : +i.value);
+    if (k === "hillK") LY.hills = true; if (k === "labelK") LY.labels = true; if (k === "nameLvl") LY.names = true; if (k === "genK") LY.gen = true; if (k === "width") LY.tracks = true;
+    sync(); saveLY(); if (k === "base") setTiles(); else applyLayers();
+  }));
+  pan.querySelector(".reset").onclick = () => { Object.assign(LY, LYDEF); saveLY(); sync(); setTiles(); };
+  window.syncLayers = sync; sync();
+})();
+const Note = L.Control.extend({ options: { position: "bottomleft" }, onAdd() { const d = L.DomUtil.create("div", "mapnote"); d.id = "mapnote"; L.DomEvent.disableClickPropagation(d); return d; } });
+map.addControl(new Note());
+L.control.scale({ imperial: false, position: "bottomright" }).addTo(map);
+function note(h) { document.getElementById("mapnote").innerHTML = h || ""; }
+
+/* state */
+const ST = { y0: SITE.ymin, y1: SITE.ymax, basins: new Set(BAS.map(b => b[0])), min: -1, sel: null, country: null, playing: null };
+const T = { byDec: {}, list: [], byG: {}, loading: {} };   // storms: {g, sid, nm, season, basin, peak, src, pcat, pres, start, end, hits, x:Float64Array, y, c:string}
+const mercY = lat => { const s = Math.sin(Math.max(-85.05, Math.min(85.05, lat)) * Math.PI / 180); return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI); };
+function decode(r) {
+  const d = r[12], n = d.length / 2, x = new Float64Array(n), y = new Float64Array(n), lon = new Float32Array(n), lat = new Float32Array(n);
+  let a = 0, b = 0; for (let i = 0; i < n; i++) { a += d[2 * i]; b += d[2 * i + 1]; lon[i] = a / 10; lat[i] = b / 10; x[i] = (lon[i] + 180) / 360; y[i] = mercY(lat[i]); }
+  const c = new Int8Array(n); for (let i = 0; i < n; i++) c[i] = r[13][i] === "u" ? -1 : +r[13][i];
+  let w = 180, e = -180, s = 90, nn = -90; for (let i = 0; i < n; i++) { w = Math.min(w, lon[i]); e = Math.max(e, lon[i]); s = Math.min(s, lat[i]); nn = Math.max(nn, lat[i]); }
+  return { g: r[0], sid: r[1], nm: r[2], season: r[3], yr: +r[9].slice(0, 4), basin: r[4], peak: r[5], src: r[6], pcat: r[7], pres: r[8], start: r[9], end: r[10], hits: r[11], x, y, lon, lat, c, bb: [w, s, e, nn] };
+}
+function loadDec(d) {
+  if (T.byDec[d] || T.loading[d]) return T.loading[d] || Promise.resolve();
+  T.loading[d] = fetch(`data/tracks/${d}.json`).then(r => r.json()).then(j => { T.byDec[d] = j.s.map(decode); T.byDec[d].forEach(s => T.byG[s.g] = s); T.list = Object.keys(T.byDec).sort().flatMap(k => T.byDec[k]); trk.draw(); side(); });
+  return T.loading[d];
+}
+const decsFor = (a, b) => SITE.decades.filter(d => (d + 9 >= a && d <= b + 1) || (d === 2020 && b >= 2019));
+function ensure(a, b) { return Promise.all(decsFor(a, b).sort((p, q) => q - p).map(loadDec)); }
+const visible = s => s.yr >= ST.y0 && s.yr <= ST.y1 && ST.basins.has(s.basin) && (ST.min < 0 || s.pcat >= ST.min) && (LY.unk || s.pcat >= 0);
+const single = () => ST.y0 === ST.y1;
+
+/* tracks canvas */
+const TrackCanvas = L.Layer.extend({
+  onAdd(m) { this._c = L.DomUtil.create("canvas", "trkcanvas"); m.getPane("trk").appendChild(this._c); m.on("moveend zoomend resize viewreset", this._reset, this); this._reset(); },
+  onRemove(m) { L.DomUtil.remove(this._c); m.off("moveend zoomend resize viewreset", this._reset, this); this._c = null; },
+  _reset() { if (!this._c) return; const s = map.getSize(), d = devicePixelRatio || 1; L.DomUtil.setPosition(this._c, map.containerPointToLayerPoint([0, 0])); this._c.width = s.x * d; this._c.height = s.y * d; this._c.style.width = s.x + "px"; this._c.style.height = s.y + "px"; this.draw(); },
+  frame() { const z = map.getZoom(), Wd = 256 * Math.pow(2, z), o = map.containerPointToLayerPoint([0, 0]).add(map.getPixelOrigin()); return { Wd, ox: o.x, oy: o.y, sz: map.getSize() }; },
+  shifts(s, F) { const out = []; for (const k of [-1, 0, 1]) { const x0 = ((s.bb[0] + 180) / 360 + k) * F.Wd - F.ox, x1 = ((s.bb[2] + 180) / 360 + k) * F.Wd - F.ox; if (x1 >= -20 && x0 <= F.sz.x + 20) out.push(k); } return out; },
+  draw() {
+    if (!this._c) return; const ctx = this._c.getContext("2d"), d = devicePixelRatio || 1; ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, this._c.width, this._c.height);
+    const F = this.frame(), z = map.getZoom(); this.F = F;
+    const vis = T.list.filter(visible), nv = vis.length; this.vis = vis; for (const s of vis) s._k = this.shifts(s, F);
+    if (LY.tracks) {
+      const dense = !single() && nv > 1500, wz = LY.width * (z < 2 ? .7 : z < 3 ? .85 : z < 5 ? 1.1 : 1.5);
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      for (let c = -1; c <= 6; c++) {
+        ctx.beginPath(); let any = false;
+        for (const s of vis) { const x = s.x, y = s.y, cc = s.c, n = x.length;
+          for (const k of s._k) { const ox = k * F.Wd - F.ox;
+            for (let i = 0; i < n - 1; i++) { if (cc[i] !== c) continue; ctx.moveTo(x[i] * F.Wd + ox, y[i] * F.Wd - F.oy); ctx.lineTo(x[i + 1] * F.Wd + ox, y[i + 1] * F.Wd - F.oy); any = true; } } }
+        if (!any) continue;
+        ctx.strokeStyle = ccol(c); ctx.globalAlpha = dense ? (c <= 0 ? .28 : c === 1 ? .38 : .62) : (c <= 0 ? .65 : .92);
+        ctx.lineWidth = wz * (c <= 0 ? .8 : c === 1 ? 1 : 1 + (c - 1) * .32) * (dense ? 1 : 1.5);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if (LY.births) { ctx.fillStyle = isDark() ? "#fff" : "#1C2027"; for (const s of vis) for (const k of s._k) { ctx.beginPath(); ctx.arc(s.x[0] * F.Wd + k * F.Wd - F.ox, s.y[0] * F.Wd - F.oy, z < 3 ? 1.4 : 2.2, 0, 7); ctx.fill(); } }
+    if (LY.lf && LFP) { this.lfv = [];
+      for (const p of LFP.rows) { if (p[8] < ST.y0 || p[8] > ST.y1) continue; const s = T.byG[p[3]]; if (s && !visible(s)) continue; if (ST.country && LFP.countries[p[4]] !== ST.country) continue; this.lfv.push(p); }
+      const r = z < 3 ? 2.2 : z < 5 ? 3 : 4.2;
+      this.lfv.sort((a, b) => a[2] - b[2]).forEach(p => { const X = (p[1] + 180) / 360, Y = mercY(p[0]); for (const k of [-1, 0, 1]) { const px = (X + k) * F.Wd - F.ox, py = Y * F.Wd - F.oy; if (px < -5 || px > F.sz.x + 5) continue;
+        ctx.beginPath(); ctx.arc(px, py, r, 0, 7); ctx.fillStyle = ccol(p[2]); ctx.fill(); ctx.lineWidth = .8; ctx.strokeStyle = isDark() ? "#000" : "#fff"; ctx.stroke(); } }); }
+    const sel = ST.sel != null ? T.byG[ST.sel] : null;
+    if (sel) { for (const k of this.shifts(sel, F)) { const ox = k * F.Wd - F.ox;
+      ctx.beginPath(); for (let i = 0; i < sel.x.length; i++) { const px = sel.x[i] * F.Wd + ox, py = sel.y[i] * F.Wd - F.oy; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.strokeStyle = isDark() ? "#fff" : "#1C2027"; ctx.lineWidth = 6.5; ctx.globalAlpha = .9; ctx.stroke(); ctx.globalAlpha = 1;
+      for (let i = 0; i < sel.x.length - 1; i++) { ctx.beginPath(); ctx.moveTo(sel.x[i] * F.Wd + ox, sel.y[i] * F.Wd - F.oy); ctx.lineTo(sel.x[i + 1] * F.Wd + ox, sel.y[i + 1] * F.Wd - F.oy); ctx.strokeStyle = ccol(sel.c[i]); ctx.lineWidth = 3.4; ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(sel.x[0] * F.Wd + ox, sel.y[0] * F.Wd - F.oy, 4, 0, 7); ctx.fillStyle = isDark() ? "#fff" : "#1C2027"; ctx.fill(); } }
+    note(single() ? `<b>${ST.y0}</b>: ${nv} storms shown` : `${nv.toLocaleString("en-GB")} storms shown, ${ST.y0} to ${ST.y1}`);
+  },
+  pick(cp) {  // nearest landfall dot (within 7 px), else nearest track segment (within 8 px)
+    const F = this.F; if (!F) return null;
+    if (LY.lf && this.lfv) { let bl = null, bd = 49; for (const p of this.lfv) { const X = (p[1] + 180) / 360, Y = mercY(p[0]); for (const k of [-1, 0, 1]) { const dx = (X + k) * F.Wd - F.ox - cp.x, dy = Y * F.Wd - F.oy - cp.y, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; bl = { lf: p }; } } } if (bl) return bl; }
+    if (!LY.tracks) return null;
+    let best = null, bd = 64;
+    for (const s of this.vis || []) for (const k of s._k || []) { const ox = k * F.Wd - F.ox;
+      for (let i = 0; i < s.x.length - 1; i++) { const ax = s.x[i] * F.Wd + ox - cp.x, ay = s.y[i] * F.Wd - F.oy - cp.y, bx = s.x[i + 1] * F.Wd + ox - cp.x, by = s.y[i + 1] * F.Wd - F.oy - cp.y;
+        const vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy; let t = L2 ? -(ax * vx + ay * vy) / L2 : 0; t = Math.max(0, Math.min(1, t)); const qx = ax + t * vx, qy = ay + t * vy, dd = qx * qx + qy * qy;
+        if (dd < bd - 4 || (dd < bd + 4 && best && s.pcat > best.s.pcat)) { bd = Math.min(bd, dd); best = { s, i, t, k }; } } }
+    return best;
+  }
+});
+const trk = new TrackCanvas(); trk.addTo(map);
+
+/* landfalls */
+let LFP = null;
+function loadLandfalls() { if (LFP) return Promise.resolve(); return fetch("data/landfalls.json").then(r => r.json()).then(j => { LFP = j; trk.draw(); }); }
+
+/* popups and side panel */
+function stormHtml(s) {
+  const hits = s.hits.length ? s.hits.map(([c, k]) => `${esc(c)} <small>(${esc(k < 0 ? "wind not recorded" : CATS[k][1] === "TS" ? "tropical storm" : CATS[k][0].replace("Category ", "Cat "))})</small>`).join(", ") : "none: stayed at sea, or came ashore below tropical storm strength";
+  return `<b>${esc(s.nm || "Unnamed storm")}</b> ${s.season}<br>${esc(BN[s.basin])}<br>${pcat(s.pcat)}<br>Peak wind: ${kt(s.peak)}${s.src === 2 ? " <small>(agency wind, may be a 10-minute average)</small>" : ""}${s.pres ? `<br>Lowest pressure: ${s.pres} hPa` : ""}<br>${esc(s.start)} to ${esc(s.end)}<br>Hit: ${hits}`;
+}
+function selectStorm(s, ll, move) {
+  ST.sel = s.g; ST.country = null;
+  if (move) { let b = L.latLngBounds([[s.bb[1], s.bb[0]], [s.bb[3], s.bb[2]]]); map.fitBounds(b, { maxZoom: 6, padding: [20, 20] }); toMap(); }
+  let pk = 0; for (let i = 0; i < s.c.length; i++) if (s.c[i] > s.c[pk]) pk = i;
+  const at = ll || L.latLng(s.lat[pk], s.lon[pk]);
+  setTimeout(() => L.popup({ maxWidth: 300 }).setLatLng(at).setContent(stormHtml(s)).openOn(map), move ? 350 : 0);
+  trk.draw(); side();
+}
+function catBar(cnt, tot) { return `<div class="catbar">${cnt.map((v, c) => v ? `<span style="width:${100 * v / tot}%;background:${ccol(c - 1)}" title="${esc(catName(c - 1))}: ${v}"></span>` : "").join("")}</div>`; }
+function side() {
+  const box = document.getElementById("side"); let h = "";
+  const s = ST.sel != null ? T.byG[ST.sel] : null;
+  if (s) {
+    h = `<button class="back">Back</button><h4>${esc(BN[s.basin])}</h4><div class="big">${esc(s.nm || "Unnamed storm")} <span style="font-weight:400">${s.season}</span></div>${pcat(s.pcat)}<table>
+      <tr><td>Peak wind</td><td class="num">${s.peak == null ? "not recorded" : s.peak + " kt"}<br><small>${s.peak == null ? "" : 5 * Math.round(s.peak * 1.15078 / 5) + " mph, " + 5 * Math.round(s.peak * 1.852 / 5) + " km/h"}</small></td></tr>
+      <tr><td>Wind source</td><td class="num"><small>${s.src === 1 ? "US agencies, 1-minute" : s.src === 2 ? "agency, often 10-minute" : "none"}</small></td></tr>
+      <tr><td>Lowest pressure</td><td class="num">${s.pres ? s.pres + " hPa" : "not recorded"}</td></tr>
+      <tr><td>Dates (UTC)</td><td class="num">${esc(s.start)}<br>to ${esc(s.end)}</td></tr>
+      <tr><td>IBTrACS id</td><td class="num"><small>${esc(s.sid)}</small></td></tr></table>`;
+    h += `<h4>Landfalls</h4>` + (s.hits.length ? `<ul>${s.hits.map(([c, k]) => `<li><span class="go" data-c="${esc(c)}">${esc(c)}</span> <small>${esc(catName(k))}</small></li>`).join("")}</ul>` : `<p class="sub">None at tropical storm strength.</p>`);
+    h += `<p class="sub">Landfall strength is interpolated between six-hourly positions and can be a category below the official figure.</p>`;
+  } else if (ST.country) {
+    const c = SITE.countries[ST.country];
+    h = `<button class="back">Back</button><h4>Landfalls</h4><div class="big">${esc(ST.country)}</div>`;
+    if (!c) h += `<p class="sub">No landfall at tropical storm strength in the record.</p>`;
+    else { h += `<table><tr><td></td><td class="num">1980 to ${LAST}</td><td class="num">${SITE.first} to ${LAST}</td></tr><tr><td>Tropical storm or more</td><td class="num">${c.sat[0]}</td><td class="num">${c.all[0]}</td></tr><tr><td>Hurricane strength</td><td class="num">${c.sat[1]}</td><td class="num">${c.all[1]}</td></tr><tr><td>Category 3+</td><td class="num">${c.sat[2]}</td><td class="num">${c.all[2]}</td></tr></table><p class="sub">Storms counted once per country. First recorded landfall with a known wind: ${c.first}. The early record is incomplete.</p>`;
+      if (c.regions.length) h += `<h4>Most hit since 1980</h4><ul>${c.regions.map(r => `<li>${esc(r[0])} <small>${r[1]}</small></li>`).join("")}</ul>`;
+      h += `<h4>Strongest landfalls</h4><ul>${c.top.map(t => `<li><span class="go" data-g="${t[0]}">${esc(t[1] || "Unnamed")} ${t[2]}</span> <small>${t[3]} kt, ${esc(t[4])}</small></li>`).join("")}</ul>`; }
+  } else {
+    const vis = T.list.filter(visible), cnt = Array(8).fill(0); vis.forEach(x => cnt[x.pcat + 1]++);
+    h = `<h4>Shown now</h4><div class="big">${vis.length.toLocaleString("en-GB")} storms</div><p class="sub">${single() ? "Storms that began in " + ST.y0 : "Storms that began " + ST.y0 + " to " + ST.y1}${ST.basins.size < BAS.length ? ", " + [...ST.basins].map(b => BN[b]).join(", ") : ", all basins"}${T.list.length < 13000 && decsFor(ST.y0, ST.y1).some(d => !T.byDec[d]) ? " (loading)" : ""}</p>${vis.length ? catBar(cnt, vis.length) : ""}`;
+    h += `<table>${cnt.map((v, i) => v ? `<tr><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${ccol(i - 1)};margin-right:6px"></span>${esc(i ? CATS[i - 1][0] : "No wind recorded")}</td><td class="num">${v.toLocaleString("en-GB")}</td></tr>` : "").reverse().join("")}</table>`;
+    const top = vis.filter(x => x.peak != null && x.src === 1).sort((a, b) => b.peak - a.peak || (a.pres || 2000) - (b.pres || 2000)).slice(0, 8);
+    if (top.length) h += `<h4>Strongest shown</h4><ol>${top.map(x => `<li><span class="go" data-g="${x.g}">${esc(x.nm || "Unnamed")} ${x.season}</span> <small>${x.peak} kt</small></li>`).join("")}</ol>`;
+    h += `<p class="sub">Click a track or a landfall dot, or click a country for its landfalls. Base map, labels, landfalls and where storms form are under Map layers.</p>`;
+  }
+  box.innerHTML = h;
+  const b = box.querySelector(".back"); if (b) b.onclick = () => { ST.sel = null; ST.country = null; map.closePopup(); trk.draw(); side(); };
+  box.querySelectorAll("[data-g]").forEach(e => e.onclick = () => { const s = T.byG[+e.dataset.g]; if (s) selectStorm(s, null, true); });
+  box.querySelectorAll("[data-c]").forEach(e => e.onclick = () => goCountry(e.dataset.c));
+}
+function toMap() { if (small()) document.getElementById("map").scrollIntoView({ behavior: "smooth", block: "start" }); }
+function bySid(sid) { const yr = +sid.slice(0, 4); const go = () => { const s = T.list.find(x => x.sid === sid); if (s) selectStorm(s, null, true); };
+  const ds = [yr, yr + 1].map(y => Math.min(2020, Math.floor(y / 10) * 10)); Promise.all(ds.map(loadDec)).then(go); }
+function byG(g, dec) { loadDec(dec).then(() => { const s = T.byG[g]; if (s) selectStorm(s, null, true); }); }
+function inPoly(x, y, ring) { let ins = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins; } return ins; }
+function countryAt(ll) { if (!COUNTRIES) return null; const x = ((ll.lng + 180) % 360 + 360) % 360 - 180, y = ll.lat;
+  for (const f of COUNTRIES.features) { const g = f.geometry, ps = g.type === "Polygon" ? [g.coordinates] : g.coordinates; for (const p of ps) if (inPoly(x, y, p[0])) return f.properties.iso; } return null; }
+const isoName = iso => { const c = Object.entries(SITE.countries).find(([n, v]) => v.iso === iso); return c ? c[0] : (CN.cname || {})[iso] || iso; };
+function goCountry(name) {
+  ST.country = name; ST.sel = null; map.closePopup(); if (!LY.lf) { LY.lf = true; saveLY(); window.syncLayers && window.syncLayers(); }
+  loadLandfalls().then(() => { const pts = LFP.rows.filter(p => LFP.countries[p[4]] === name); if (pts.length) { const lat = pts.map(p => p[0]).sort((a, b) => a - b), lon = pts.map(p => p[1]).sort((a, b) => a - b), q = (a, f) => a[Math.floor(f * (a.length - 1))];
+    map.fitBounds([[q(lat, .02) - 1, q(lon, .02) - 1], [q(lat, .98) + 1, q(lon, .98) + 1]], { maxZoom: 7 }); } else { const c = SITE.countries[name]; if (c) map.setView([c.lat, c.lon], 5); }
+    applyLayers(); side(); toMap(); });
+}
+function goRegion(r) { goCountry(r.name); loadLandfalls().then(() => { const ri = LFP.regions.indexOf(r.region); const pts = LFP.rows.filter(p => p[6] === ri && LFP.countries[p[4]] === r.name); if (pts.length) { const b = L.latLngBounds(pts.map(p => [p[0], p[1]])); map.fitBounds(b.pad(.3), { maxZoom: 8 }); } }); }
+map.on("click", e => {
+  const hit = trk.pick(e.containerPoint);
+  if (hit && hit.lf) { const p = hit.lf, s = T.byG[p[3]];
+    L.popup({ maxWidth: 290 }).setLatLng([p[0], p[1]]).setContent(`<b>${esc(s ? s.nm || "Unnamed storm" : "Storm")}</b> ${p[5]}<br>Landfall: ${esc(LFP.regions[p[6]])}, ${esc(LFP.countries[p[4]])}<br>${pcat(p[2])}<br>Wind at landfall (interpolated): ${p[7] < 0 ? "not recorded" : p[7] + " kt"}${s ? `<br><span class="go" onclick="byG(${p[3]},${Math.min(2020, Math.floor(p[5] / 10) * 10)})">Show the track</span>` : ""}`).openOn(map);
+    if (s) { ST.sel = s.g; trk.draw(); side(); } return; }
+  if (hit && hit.s) { selectStorm(hit.s, e.latlng, false); return; }
+  const iso = countryAt(e.latlng); if (iso) { const nm = isoName(iso); ST.country = nm; ST.sel = null; side(); trk.draw(); note(`<b>${esc(nm)}</b>`); return; }
+  if (ST.sel != null || ST.country) { ST.sel = null; ST.country = null; trk.draw(); side(); }
+});
+
+/* controls */
+const press = (row, b) => document.querySelectorAll(row + " .btn").forEach(x => x.setAttribute("aria-pressed", x === b));
+const yr = document.getElementById("yr"), yrlab = document.getElementById("yrlab"), playB = document.getElementById("play");
+yr.min = SITE.ymin; yr.max = SITE.ymax; yr.value = SITE.ymax;
+function setRange(a, b, src) {
+  ST.y0 = a; ST.y1 = b; ensure(a, b).then(() => side());
+  yrlab.innerHTML = a === b ? `${a}<small>${a > LAST ? "so far, provisional" : "storms that began this year"}</small>` : (a === SITE.ymin && b === SITE.ymax ? `All<small>drag to pick a year</small>` : `${a} to ${b}<small>drag to pick a year</small>`);
+  if (src !== "slider") yr.value = b;
+  if (src !== "period") press("#perRow", null);
+  trk.draw(); side();
+}
+yr.addEventListener("input", () => { stopPlay(); setRange(+yr.value, +yr.value, "slider"); });
+function stopPlay() { if (ST.playing) { clearInterval(ST.playing); ST.playing = null; playB.textContent = "▶"; playB.setAttribute("aria-label", "Play the years one by one"); } }
+playB.onclick = () => { if (ST.playing) { stopPlay(); return; }
+  let y = single() && ST.y0 < SITE.ymax ? ST.y0 : SITE.ymin; playB.textContent = "❚❚"; playB.setAttribute("aria-label", "Pause");
+  ensure(SITE.ymin, SITE.ymax); setRange(y, y, "play");
+  ST.playing = setInterval(() => { y++; if (y > SITE.ymax) { stopPlay(); return; } setRange(y, y, "play"); }, 650); };
+const PER = { all: [SITE.ymin, SITE.ymax], sat: [SAT0, SITE.ymax], pre: [SITE.ymin, 1969], dec: [SITE.ymax - 9, SITE.ymax] };
+document.querySelectorAll("#perRow .btn").forEach(b => b.onclick = () => { stopPlay(); press("#perRow", b); setRange(...PER[b.dataset.p], "period"); });
+(function basRow() { const row = document.getElementById("basRow");
+  BAS.forEach(b => { const x = document.createElement("button"); x.className = "btn"; x.innerHTML = `<i style="background:${b[2]}"></i>${esc(b[1])}`; x.setAttribute("aria-pressed", "true");
+    x.onclick = () => { if (ST.basins.has(b[0]) && ST.basins.size === BAS.length) { ST.basins = new Set([b[0]]); } else if (ST.basins.has(b[0])) { ST.basins.delete(b[0]); if (!ST.basins.size) ST.basins = new Set(BAS.map(q => q[0])); } else ST.basins.add(b[0]);
+      row.querySelectorAll(".btn").forEach((q, i) => q.setAttribute("aria-pressed", ST.basins.has(BAS[i][0]))); trk.draw(); side(); };
+    row.appendChild(x); });
+  const all = document.createElement("button"); all.className = "btn"; all.textContent = "All basins"; all.onclick = () => { ST.basins = new Set(BAS.map(q => q[0])); row.querySelectorAll(".btn").forEach(q => q.setAttribute("aria-pressed", "true")); trk.draw(); side(); }; row.appendChild(all); })();
+document.querySelectorAll("#minRow .btn").forEach(b => b.onclick = () => { ST.min = +b.dataset.m; press("#minRow", b); trk.draw(); side(); });
+const FOCUS = [["World", null], ["North Atlantic", [[8, -100], [48, -10]]], ["Western Pacific", [[2, 100], [45, 165]]], ["Eastern Pacific", [[5, -150], [35, -90]]], ["Bay of Bengal and Arabian Sea", [[2, 50], [30, 100]]], ["South Indian Ocean", [[-35, 30], [-5, 120]]], ["Australia and South Pacific", [[-40, 105], [-5, 200]]]];
+(function focusRow() { const row = document.getElementById("focusRow");
+  FOCUS.forEach(([n, b]) => { const x = document.createElement("button"); x.className = "btn"; x.textContent = n; x.onclick = () => { if (b) map.fitBounds(b); else map.setView(...HOME()); toMap(); }; row.appendChild(x); }); })();
+document.getElementById("showGen").onclick = () => { LY.gen = true; LY.tracks = false; LY.births = false; LY.lf = false; ST.country = null; ST.sel = null; map.closePopup(); side(); saveLY(); window.syncLayers(); applyLayers(); map.setView(...HOME()); document.getElementById("atlas").scrollIntoView({ behavior: "smooth" });
+  note(`Where storms that reached tropical storm strength formed, 1980 to ${LAST}. Turn tracks back on under Map layers.`); };
+function legend() {
+  const e = document.getElementById("legend"); let h = "";
+  h += CATS.map((c, i) => `<span><i class="ln" style="background:${ccol(i)}"></i>${esc(c[0])}</span>`).join("") + (LY.unk ? `<span><i class="ln" style="background:${ccol(-1)}"></i>no wind recorded</span>` : "");
+  if (LY.lf) h += `<span><i style="background:${ccol(4)};border:1.5px solid #fff"></i>landfall, coloured by strength</span>`;
+  if (LY.gen) h += `<span>forms</span><span class="ramp" style="background:linear-gradient(90deg,#FFECB3,#FDAE61,#E45734,#B2183F,#5E0A48)"></span><span>most often</span>`;
+  e.innerHTML = h;
+}
+
+/* search */
+let SEARCH = null;
+(function search() {
+  const q = document.getElementById("q"), sug = document.getElementById("sug"); let items = [], sel = -1;
+  const run = () => { const s = q.value.trim().toLowerCase(); if (s.length < 2) { sug.style.display = "none"; return; }
+    if (!SEARCH) { fetch("data/search.json").then(r => r.json()).then(j => { SEARCH = j; run(); }); return; }
+    const m = s.match(/^(.*?)\s*(\d{4})$/), nm = m ? m[1] : s, y = m ? +m[2] : null, out = [];
+    Object.keys(SITE.countries).forEach(c => { if (!y && c.toLowerCase().startsWith(nm)) out.push({ t: c, sub: "country: landfalls", go: () => goCountry(c) }); });
+    SEARCH.forEach(r => { if (!r[1]) return; const n = r[1].toLowerCase(); if ((nm ? n.startsWith(nm) : true) && (!y || r[2] === y)) out.push({ t: r[1] + " " + r[2], sub: BN[r[3]] + " · " + CATS[Math.max(0, r[4])][0].toLowerCase(), k: r[4], go: () => byG(r[0], r[5]) }); });
+    out.sort((a, b) => (a.k == null) - (b.k == null) || (b.k ?? 0) - (a.k ?? 0));
+    CITIES.forEach(c => { if (out.length < 16 && !y && c.name.toLowerCase().startsWith(nm)) out.push({ t: c.name, sub: "town", go: () => { map.setView([c.lat, c.lon], 6); toMap(); } }); });
+    items = out.slice(0, 16); sel = -1;
+    sug.innerHTML = items.map((x, i) => `<li role="option" data-i="${i}">${esc(x.t)} <span>${esc(x.sub)}</span></li>`).join("") || `<li>No match</li>`; sug.style.display = "block";
+    sug.querySelectorAll("li[data-i]").forEach(li => li.onclick = () => { items[+li.dataset.i].go(); sug.style.display = "none"; }); };
+  q.addEventListener("input", run);
+  q.addEventListener("keydown", e => { if (e.key === "ArrowDown") { sel = Math.min(items.length - 1, sel + 1); } else if (e.key === "ArrowUp") { sel = Math.max(0, sel - 1); } else if (e.key === "Enter") { const x = items[sel < 0 ? 0 : sel]; if (x) { x.go(); sug.style.display = "none"; } return; } else if (e.key === "Escape") { sug.style.display = "none"; return; } else return;
+    e.preventDefault(); sug.querySelectorAll("li").forEach((li, i) => li.setAttribute("aria-selected", i === sel)); });
+  document.addEventListener("click", e => { if (!sug.contains(e.target) && e.target !== q) sug.style.display = "none"; });
+})();
+
+/* theme */
+document.getElementById("theme").onclick = () => { const r = document.documentElement; r.dataset.theme = isDark() ? "light" : "dark"; setTiles(); redrawAll(); legend(); lfTable(); side(); };
+
+/* load */
+pyChart(); monChart(); lfTable(); rgTable(); stTable(); shChart(); lmiChart(); lbChart();
+setTiles(); legend(); side();
+ensure(SITE.ymin, SITE.ymax);
+fetch("data/world.json").then(r => r.json()).then(j => { COUNTRIES = j; cLayer.addData(j); });
+fetch("data/countries.json").then(r => r.json()).then(j => { CN = j; placeNames(); });
+fetch("data/cities.json").then(r => r.json()).then(j => { CITIES = j; placeNames(); });
+</script>
+/*FULLSCREEN*/
+</body>
+</html>

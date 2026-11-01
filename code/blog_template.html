@@ -1,0 +1,115 @@
+<!-- wp:paragraph -->
+<p><em>I drew every hurricane, typhoon and cyclone in NOAA's global archive on one map, {{counts.n_systems|int}} storms since 1851, and asked three questions: where do they form, where do they hit, and are they getting stronger? The answers are clear for the first two. For the third, the honest answer depends on knowing what the old records missed.</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://maps.tristanhotham.com/hurricane-tracks/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://doi.org/10.5281/zenodo.23858051">Read the paper</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:paragraph -->
+<p>Every few years a storm arrives that seems to break the scale, and the same question follows it: are hurricanes getting worse? It sounds like a question with a simple answer, because the storms have been tracked for so long. NOAA's International Best Track Archive for Climate Stewardship, IBTrACS, gathers the tracks of every forecasting agency into one record: the position, wind and pressure of every tropical cyclone, every six hours, from the Atlantic hurricanes of the 1850s to this year's typhoons. That is {{meta.n_points|int}} positions. So I put them all on one map.</p>
+<!-- /wp:paragraph -->
+
+{{IMG|b_map.png|World map centred on the Pacific showing thousands of storm tracks coloured by strength, from pale blue for weak storms through yellow and orange to deep red and plum for Category 4 and 5. The western North Pacific is a dense dark red and plum mass between the Philippines and Japan; the North Atlantic, eastern Pacific, Bay of Bengal, South Indian Ocean and the seas around Australia form other bright clusters. A band either side of the equator, and the South Atlantic, are almost empty|Every tropical cyclone track in IBTrACS, 1851 to 2025, coloured by Saffir-Simpson category at each point.}}
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">About {{k.ts_per_year|int}} a year, and a record that used to miss them</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Since 1980, when satellites watched the whole tropics, about {{counts.sat_ts_mean|int}} storms a year have reached tropical storm strength and {{counts.sat_hu_mean|int}} have become hurricanes, typhoons or severe cyclones. The western Pacific, typhoon country, has {{counts.basin_ts_share.WP|pc}} of them; the much-studied North Atlantic only {{counts.basin_ts_share.NA|pc}}. Over those {{counts.sat_years|int}} seasons the number has not clearly changed.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Look further back and the storms seem to multiply, but that is mostly a story about seeing. Before satellites, a storm entered the record only if it hit land or a ship met it. In the North Atlantic, the one basin with winds back to 1851, the early record has {{counts.na_ts_py_1851_1900|f1}} tropical storms a season against {{counts.na_ts_py_1976_2025|f1}} in the last fifty years, and the missing ones are exactly the storms you would expect to miss: only {{counts.na_far_pct_1851_1900|pc}} of the early storms never came within 500 km of land, against {{counts.na_far_pct_1976_2025|pc}} now. Elsewhere the archive has tracks from the nineteenth century but no winds until the 1940s or later. So I only compare strength from 1980 on.</p>
+<!-- /wp:paragraph -->
+
+{{IMG|b_peryear.png|Two stacked bar charts of storms per season from 1851 to 2025, coloured by basin. Every system in the archive rises from about 15 a year in the 1850s to 80 to 120 a year after 1970. Storms with a recorded wind of tropical storm strength are almost all North Atlantic until the 1940s, then other basins appear and the total climbs to about 90 a year after 1980. The years before 1970 are shaded|Storms per season by basin: every system in the archive (top), and those that reached tropical storm strength where a wind was recorded (bottom). Shaded: before satellites.}}
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Where they form</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Storms are born in two belts over warm water, mostly between 5 and 20 degrees from the equator, and almost never on it: only {{genesis.eq5_pct|f1}}% start within 5 degrees, where the Earth's spin is too weak to wind them up. The busiest nursery on the planet is a patch of sea off southern Mexico, which spawns about {{genesis.top.0.per_dec|int}} storms a decade in a single 2.5 degree square. The South Atlantic almost never makes one: {{genesis.sa_n|int}} since 1980.</p>
+<!-- /wp:paragraph -->
+
+{{IMG|b_genesis.png|World map with a smoothed heat map of where storms formed from 1980 to 2025: two warm bands north and south of the equator, darkest off the Pacific coast of southern Mexico, east of the Philippines and across the South Indian Ocean, with a clear gap along the equator and almost nothing in the South Atlantic or south-east Pacific|Where storms that reached tropical storm strength formed, 1980 to 2025.}}
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Where they hit</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>To count landfalls I traced every six-hourly segment of every track against the world's coastlines. Since 1980, {{landfall.landfall_pct|pc}} of tropical storms have come ashore somewhere. China is hit most often, {{landfall.top.0.ts|int}} storms in {{counts.sat_years|int}} seasons, and its southern coast, Guangdong, is the most-hit place on Earth with {{landfall.top_regions.0.ts|int}}. But the Philippines takes the hardest blows: {{landfall.top_hu.0.hu|int}} storms reached it at typhoon strength and {{landfall.top_hu.0.mj|int}} at Category 3 or more, both the most of any country, because typhoons hit its eastern islands at their peak, straight off the open Pacific. The United States had {{landfall.top.5.ts|int}}.</p>
+<!-- /wp:paragraph -->
+
+{{IMG|b_landfalls.png|Horizontal bar chart of the 20 countries with most landfalls from 1980 to 2025, split by strength at landfall. China leads with 263, then the Philippines, Japan, Australia, Mexico and the United States. The Philippines has by far the longest red section for Category 3 or more|Countries with most landfalls, 1980 to 2025, by strength at landfall. A storm counts once per country.}}
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>The number of storms has not changed since 1980. Where they peak, and how many reach the top of the scale, has.</p></blockquote></figure>
+<!-- /wp:pullquote -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Are they getting stronger?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>If storms are getting stronger, more of them should reach the top of the scale. Using only the US agencies' 1-minute winds, so that every storm is measured the same way, {{shares.global.0.s4|pc}} of storms reached Category 4 or 5 in the 1980s, {{shares.global.1.s4|pc}} in the 1990s, {{shares.global.2.s4|pc}} in the 2000s and {{shares.global.3.s4|pc}} in the 2010s. Split the satellite era in half and it is {{shares.halves.s4_1|f1}}% against {{shares.halves.s4_2|f1}}%, a difference chance would rarely produce. The clearest rises are in the South Pacific, the western Pacific and the South Indian Ocean; the North Atlantic shows no clear change.</p>
+<!-- /wp:paragraph -->
+
+{{IMG|b_shares.png|Grouped bar chart of the share of storms reaching Category 3 or more and Category 4 or more, by decade from the 1980s to 2020 to 2025: Category 4 or more is 12.5% in the 1980s, about 20% in the 1990s and 2000s, 22.8% in the 2010s and 18.5% so far in the 2020s. Below, four small charts of the Category 4 share by decade in the North Atlantic, western North Pacific, South Indian and South Pacific, with early decades pale|Share of storms reaching Category 3+ and 4+ by decade since 1980 (top), and Category 4+ in four basins (bottom; pale where the record is patchy).}}
+
+<!-- wp:paragraph -->
+<p>Now the caveats, which matter. Most of that rise happened between the 1980s and the 1990s, when satellite methods for estimating a storm's strength were still maturing, so part of it may be better measurement rather than stronger storms. For Category 3 and above, the rise is too small to be sure of ({{shares.halves.s3_1|f1}}% against {{shares.halves.s3_2|f1}}%). And the total energy of each season shows no trend at all. Wikipedia, summarising a 2020 study by Kossin and colleagues, reports a global increase in the proportion of major storms from 1979 to 2017; the raw record agrees in direction, clearly for Category 4 and 5, less clearly below that. It does not say there are more storms.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The other change is where storms peak. In the Northern Hemisphere the average latitude of each storm's strongest moment has moved {{lmi.N_trend.km_per_dec|int}} km a decade towards the pole since 1980, in the Southern Hemisphere about {{lmi.S_trend.km_per_dec|int}} km. Almost all of it is the western Pacific, where typhoons now peak closer to Japan, Korea and China; Atlantic hurricanes, if anything, have moved the other way.</p>
+<!-- /wp:paragraph -->
+
+{{IMG|b_lmi.png|Line chart of the average latitude of storms' peak intensity each season from 1980 to 2025, rising from about 19 to 21 degrees in the Northern Hemisphere and from about 16.5 to 17.5 in the Southern, with dashed trend lines. Beside it, a dot and interval chart of the trend by basin: the western North Pacific about 65 km a decade poleward, the North Atlantic about 50 km towards the equator with an interval crossing zero|Average latitude of each storm's peak, by hemisphere (left), and the trend by basin with 95% intervals (right).}}
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">How I did this</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I used IBTrACS version 4 (revision v04r01), all basins, at six-hourly positions, keeping one track per storm. Strength is the 1-minute wind of the US agencies, which the Saffir-Simpson scale is defined on; where it is missing the map uses the regional agency's wind. Landfalls come from intersecting every track segment with Natural Earth's coastlines, with winds interpolated between positions, so a storm that peaks right at the coast can read a category low. Trends use 1980 to 2025, with bootstrap intervals. None of this separates natural cycles such as El Niño from long-term change, and none of it attributes anything to climate change. The interactive map lets you play every season since 1851, filter by basin and strength, and click any track for its name, peak wind and the countries it hit.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://maps.tristanhotham.com/hurricane-tracks/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://doi.org/10.5281/zenodo.23858051">Read the paper</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://github.com/Tristan-Hotham/hurricane-tracks">Data and code</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Notes and sources</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Knapp, K. R., Kruk, M. C., Levinson, D. H., Diamond, H. J. and Neumann, C. J. (2010) The International Best Track Archive for Climate Stewardship (IBTrACS): unifying tropical cyclone best track data. <em>Bulletin of the American Meteorological Society</em> 91, 363 to 376. Data: <a href="https://www.ncei.noaa.gov/products/international-best-track-archive">IBTrACS v04r01</a>, NOAA National Centers for Environmental Information (Gahtan et al. 2024). NOAA data, no copyright restrictions.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Wikipedia contributors, <a href="https://en.wikipedia.org/wiki/Tropical_cyclone">Tropical cyclone</a> and <a href="https://en.wikipedia.org/wiki/Saffir%E2%80%93Simpson_scale">Saffir-Simpson scale</a> (CC BY-SA 4.0), for the scale and background, including Kossin, Knapp, Olander and Velden (2020) and Kossin, Emanuel and Vecchi (2014).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><a href="https://www.naturalearthdata.com/">Natural Earth</a> coastlines, countries and provinces (public domain). Base map tiles on the interactive page © Esri.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->

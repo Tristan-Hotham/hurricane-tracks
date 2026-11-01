@@ -1,0 +1,137 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\newfontfamily\headfont{Inter}[UprightFont=*-ExtraBold,BoldFont=*-ExtraBold,Extension=.otf,Path=/usr/share/fonts/opentype/inter/]
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{graphicx,booktabs,float,caption,array,xcolor,longtable}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage[round]{natbib}
+\usepackage{setspace}
+\setstretch{1.05}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\titleformat{\section}{\headfont\Large}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\headfont\large}{\thesubsection}{0.8em}{}
+\captionsetup{font=small,labelfont=bf}
+\urlstyle{same}
+\hypersetup{pdftitle={Every Storm since 1851: Where Tropical Cyclones Form, Where They Hit, and Whether They Are Getting Stronger},pdfauthor={Tristan Hotham}}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries Every Storm since 1851: Where Tropical Cyclones Form, Where They Hit, and Whether They Are Getting Stronger\par}
+\vspace{0.4em}
+{\large A map and an honest reading of NOAA's global best track archive (IBTrACS)\par}
+\vspace{1.2em}
+{\large Tristan Hotham\par}
+\vspace{0.3em}
+{\small Independent researcher\\
+ORCID: 0000-0003-4931-9349\\
+DOI: \href{https://doi.org/{{meta.doi}}}{https://doi.org/{{meta.doi}}}\par}
+\vspace{0.8em}
+2026
+\end{center}
+
+\begin{quote}
+\small
+\begin{center}\textbf{Abstract}\end{center}
+I map every tropical cyclone in NOAA's International Best Track Archive for Climate Stewardship (IBTrACS v04r01), {{counts.n_systems|int}} storms and depressions from {{meta.first|raw}} to {{meta.last|raw}}, and use the archive to describe where storms form, where they make landfall and whether they are getting stronger, with attention to how the record itself has changed. Since 1980, {{counts.sat_ts_mean|f1}} storms a year have reached tropical storm strength and {{counts.sat_hu_mean|f1}} hurricane strength, with no clear trend in the number. Only {{genesis.eq5_pct|f1}}\% of storms form within 5 degrees of the equator. Intersecting every six-hourly segment with Natural Earth coastlines, I find that from 1980 to {{meta.last|raw}} China was hit by the most storms ({{landfall.top.0.ts|int}}), the Philippines by the most at typhoon strength ({{landfall.top_hu.0.hu|int}}) and Category 3 or more ({{landfall.top_mj.0.mj|int}}), and that Guangdong is the most-hit coast ({{landfall.top_regions.0.ts|int}}). Using only the US agencies' 1-minute winds, the share of storms reaching Category 4 or 5 rose from {{shares.halves.s4_1|f1}}\% in {{shares.halves.h1|raw}} to {{shares.halves.s4_2|f1}}\% in {{shares.halves.h2|raw}} (two-proportion test $p$ {{shares.halves.p4|p3}}), while the share reaching Category 3 or more did not change clearly. The latitude of peak intensity moved poleward by {{lmi.N_trend.km_per_dec|int}} km a decade in the Northern Hemisphere (95\% interval {{lmi.N_trend.km_lo|int}} to {{lmi.N_trend.km_hi|int}}), driven by the western North Pacific. Before about 1970 the record misses many storms, especially weak ones far from land, so long-run comparisons are not reliable, and some of the recent intensity change may reflect changing measurement.
+
+\textbf{Keywords:} tropical cyclones; hurricanes; typhoons; IBTrACS; landfall; Saffir-Simpson scale; best track data; observation bias; data visualisation
+\end{quote}
+
+\section{Introduction}
+Tropical cyclones (hurricanes in the Atlantic and eastern Pacific, typhoons in the western Pacific, cyclones in the Indian Ocean and the South Pacific) are the most destructive storms on Earth. Their tracks have been recorded by many agencies over a century and a half, and IBTrACS, maintained by NOAA's National Centers for Environmental Information, merges those records into a single global archive \citep{knapp2010,gahtan2024}. This paper does three simple things with it. It maps every track by strength; it counts where storms form and where they come ashore; and it asks whether storms are getting stronger, using the part of the record that can answer that question fairly.
+
+That last question is often asked of best track data and often answered badly. The archive is a record of observation as much as of storms: before satellites, a storm was recorded only if it reached land or a ship met it \citep{wikitc}, and the methods used to estimate intensity have changed several times. Much of the work here is therefore about separating the storms from the seeing. An interactive version, with every track, landfall and number, is at \url{{{meta.page}}}.
+
+\section{Data}
+\textbf{IBTrACS.} I use version 4, revision v04r01, all basins, reduced to the synoptic six-hourly positions (00, 06, 12 and 18 UTC): {{meta.n_rows|int}} rows. I keep the main tracks and the provisional tracks of the most recent storms (those not yet reanalysed) and drop the ``spur'' tracks that IBTrACS uses for alternative positions around splits and mergers, leaving {{meta.n_points|int}} positions of {{meta.n_storms|int}} storms. Seasons follow IBTrACS: a Southern Hemisphere season is named after the year in which it ends. The analyses use complete seasons {{meta.first|raw}} to {{meta.last|raw}} ({{counts.n_systems|int}} systems); 2026 appears on the map only. IBTrACS is NOAA data with no copyright restrictions.
+
+\textbf{Winds.} The Saffir-Simpson scale is defined on the 1-minute sustained wind at 10 m \citep{wikiss}. IBTrACS gives the 1-minute wind of the US agencies (the National Hurricane Center, the Central Pacific Hurricane Center and the Joint Typhoon Warning Center) as USA\_WIND, and the wind of the responsible regional agency as WMO\_WIND, which is often a 10-minute average and reads lower. I use USA\_WIND throughout and fall back on WMO\_WIND only for map colours, counts of storms reaching 34 knots and landfall strength. Categories are: tropical depression below 34 kt, tropical storm 34 to 63 kt, Category 1 from 64 kt, 2 from 83, 3 from 96, 4 from 113 and 5 from 137 kt. {{counts.n_nowind|int}} systems ({{counts.nowind_pct|pc}}) have no wind at all; almost all are from before the 1940s outside the North Atlantic.
+
+\textbf{Geography.} Natural Earth 1:10m countries and states and provinces (public domain) for landfalls; 1:50m land for the figures.
+
+\section{Methods}
+\textbf{Basins} are those of IBTrACS at a storm's first position (central Pacific storms are counted with the eastern Pacific). \textbf{Genesis} is the first position of each storm that reached 34 kt. \textbf{Landfall:} each six-hourly segment is drawn as a straight line in longitude and latitude and intersected with every land polygon of Natural Earth's countries, so that islands count. A landfall is a point where a segment enters land from the sea (a point 3 km back along the segment must be at sea, which drops crossings of land borders), while the storm is not yet extratropical (NATURE not ET). Its time, position and wind are interpolated along the segment. A storm counts once per country, and once per state or province, at its strongest landfall there. Natural Earth counts France's overseas departments as France; I report them under their own names.
+
+\textbf{Intensity shares} are the proportion of storms whose USA\_WIND reached 34 kt that went on to reach 96 kt (Category 3) or 113 kt (Category 4). \textbf{Latitude of lifetime maximum intensity} is the absolute latitude of the first position at which a storm's USA\_WIND peaks, averaged by season and hemisphere, following \citet{kossin2014}. \textbf{Accumulated cyclone energy} is the sum of the squared USA\_WIND, in units of $10^4$ kt$^2$, over six-hourly positions of 35 kt or more while tropical or subtropical.
+
+\textbf{Trends} are ordinary least-squares lines through seasonal values, 1980 to {{meta.last|raw}}, with 95\% intervals from 4,000 bootstrap resamples of seasons; I also compare the halves {{shares.halves.h1|raw}} and {{shares.halves.h2|raw}} with a two-proportion $z$ test. I start in 1980 because geostationary satellites then covered the whole tropics; polar-orbiting satellites became operational in 1965, and the Dvorak technique for estimating intensity from satellite images was developed in the 1970s \citep{wikitc}.
+
+\section{Results}
+\subsection{The map}
+Figure~\ref{fig:map} shows every track from {{meta.first|raw}} to {{meta.last|raw}}. The western North Pacific dominates, with the densest and strongest tracks on Earth; the grey tracks over the Bay of Bengal, the Arabian Sea and the South Indian Ocean are the long early records of those basins, which have positions but no winds.
+
+\begin{figure}[tbp]\centering\includegraphics[width=\textwidth]{f_map.png}\caption{Every tropical cyclone track in IBTrACS v04r01, {{meta.first|raw}} to {{meta.last|raw}}, coloured by Saffir-Simpson category at each six-hourly position (1-minute wind of the US agencies where given, else the agency wind). Equal Earth projection centred on 160°W.}\label{fig:map}\end{figure}
+
+\subsection{How many storms, and how many were seen}
+Since 1980 an average of {{counts.sat_ts_mean|f1}} storms a season reached tropical storm strength (range {{counts.sat_ts_min|int}} in {{counts.sat_ts_min_year|raw}} to {{counts.sat_ts_max|int}} in {{counts.sat_ts_max_year|raw}}), {{counts.sat_hu_mean|f1}} reached hurricane strength and {{counts.sat_c4_mean|f1}} Category 4 or more. The trend in the number of tropical storms is {{counts.sat_ts_trend.per_dec|sf1}} a decade (95\% interval {{counts.sat_ts_trend.lo|sf1}} to {{counts.sat_ts_trend.hi|sf1}}), in hurricanes {{counts.sat_hu_trend.per_dec|sf1}} ({{counts.sat_hu_trend.lo|sf1}} to {{counts.sat_hu_trend.hi|sf1}}). The western North Pacific contributes {{counts.basin_ts_share.WP|f1}}\% of tropical storms, the eastern Pacific {{counts.basin_ts_share.EP|f1}}\%, the South Indian {{counts.basin_ts_share.SI|f1}}\%, the North Atlantic {{counts.basin_ts_share.NA|f1}}\%, the South Pacific {{counts.basin_ts_share.SP|f1}}\% and the North Indian {{counts.basin_ts_share.NI|f1}}\%.
+
+The long record (Figure~\ref{fig:peryear}) grows for reasons that have little to do with storms. Winds first appear in the eastern Pacific in {{counts.first_wind.EP|raw}}, the western Pacific in {{counts.first_wind.WP|raw}}, the South Pacific in {{counts.first_wind.SP|raw}}, the South Indian in {{counts.first_wind.SI|raw}} and the North Indian in {{counts.first_wind.NI|raw}}; {{counts.coverage.5.any_pct|pc}} of the systems of the 1900s have a wind, against {{counts.coverage.14.any_pct|pc}} in the 1990s. In the North Atlantic, where winds go back to 1851, there were {{counts.na_ts_py_1851_1900|f1}} tropical storms a season in 1851 to 1900 and {{counts.na_ts_py_1976_2025|f1}} in 1976 to 2025, and {{counts.na_hu_py_1851_1900|f1}} against {{counts.na_hu_py_1976_2025|f1}} hurricanes. The difference is concentrated in the storms easiest to miss: only {{counts.na_far_pct_1851_1900|f1}}\% of the early storms never came within 500 km of land, against {{counts.na_far_pct_1976_2025|f1}}\% in the last fifty years. These figures describe the record, not a change in the climate.
+
+\begin{figure}[tbp]\centering\includegraphics[width=\textwidth]{f_peryear.png}\caption{Systems per season by basin of formation: every system in the archive (top) and those that reached 34 kt where a wind was recorded (bottom). Shaded: before 1970.}\label{fig:peryear}\end{figure}
+
+\subsection{Where storms form}
+The {{genesis.n|int}} storms of 1980 to {{meta.last|raw}} that reached 34 kt formed in two belts (Figure~\ref{fig:genesis}): {{genesis.within_10_25_pct|f1}}\% between 5 and 20 degrees from the equator, only {{genesis.eq5_pct|f1}}\% within 5 degrees, and {{genesis.nh_pct|f1}}\% in the Northern Hemisphere. The mean distance of genesis from the equator is {{genesis.mean_abs_lat|f1}} degrees. The densest 2.5 degree square is off southern Mexico, centred on {{genesis.top.0.lat|f1}}°N, {{k.gen_lon_w|f1}}°W, with {{genesis.top.0.per_dec|f1}} storms a decade. The South Atlantic produced {{genesis.sa_n|int}}. Peak months are September in the North Atlantic, August in the eastern and western Pacific, January in the South Indian and February in the South Pacific; the North Indian Ocean has two seasons, peaking in May and November.
+
+\begin{figure}[tbp]\centering\includegraphics[width=\textwidth]{f_genesis.png}\caption{Where storms that reached 34 kt formed, 1980 to {{meta.last|raw}}: smoothed density (Gaussian kernel, 1.6 degrees), storms per decade per 2.5 degree square.}\label{fig:genesis}\end{figure}
+
+\subsection{Where storms hit}
+From 1980 to {{meta.last|raw}}, {{landfall.landfall_pct|f1}}\% of tropical storms made landfall at tropical storm strength, and {{landfall.hu_landfall_pct|f1}}\% of hurricanes came ashore at hurricane strength, giving {{landfall.n_storm_country|int}} storm and country landfalls in {{landfall.n_countries|int}} countries and territories (Table~\ref{tab:countries}, Figure~\ref{fig:landfalls}). China leads in all landfalls, the Philippines in landfalls at typhoon strength and at Category 3 or more. Table~\ref{tab:regions} gives the most-hit states and provinces: Guangdong, Western Australia, Fujian, Queensland and Florida. Over the whole record, with winds where known, the United States has the most counted landfalls ({{landfall.all_top.0.ts|int}}), a reflection of how long its coast has been watched.
+
+Interpolating winds between six-hourly positions smooths sharp peaks, so landfall strength can read a category lower than the official value: Andrew (1992), officially a Category 5 landfall in Florida \citep{wikiss}, reads here as Category 4. The strongest landfalls by this measure are Haiyan on Leyte in 2013 ({{landfall.strongest.0.kt|int}} kt), Meranti on Batanes in 2016 ({{landfall.strongest.1.kt|int}} kt) and Dorian on the Abaco Islands in 2019 ({{landfall.strongest.2.kt|int}} kt).
+
+\begin{figure}[tbp]\centering\includegraphics[width=.8\textwidth]{f_landfalls.png}\caption{The 20 countries with most landfalls, 1980 to {{meta.last|raw}}, by strength at landfall.}\label{fig:landfalls}\end{figure}
+
+{{TABLE_COUNTRIES}}
+{{TABLE_REGIONS}}
+
+\subsection{The strongest storms}
+Table~\ref{tab:strongest} lists the strongest storms by peak 1-minute wind. Hurricane Patricia (2015) and Typhoon Nancy (1961) share the highest value, {{strongest.wind.0.kt|int}} kt; Wikipedia gives Patricia's as the highest sustained wind ever recorded \citep{wikitc}. {{strongest.n_top20_5060|int}} of the top 20 are western Pacific typhoons of the 1950s and 1960s, from the early decades of aircraft reconnaissance, whose winds are not directly comparable with modern estimates. The lowest pressure is Typhoon Tip's {{strongest.pressure.0.pres|int}} hPa in 1979. {{strongest.n_c5|int}} storms reached Category 5, {{strongest.n_c5_sat|int}} of them since 1980 and {{strongest.c5_by_basin.WP|int}} in the western North Pacific.
+
+{{TABLE_STRONGEST}}
+
+\subsection{Are storms getting stronger?}
+Figure~\ref{fig:shares} and Table~\ref{tab:shares} show the share of storms reaching Category 3+ and 4+. Worldwide the Category 4+ share was {{shares.global.0.s4|f1}}\% in the 1980s, {{shares.global.1.s4|f1}}\% in the 1990s, {{shares.global.2.s4|f1}}\% in the 2000s, {{shares.global.3.s4|f1}}\% in the 2010s and {{shares.global.4.s4|f1}}\% in 2020 to {{meta.last|raw}}. Between the halves of the satellite era it rose from {{shares.halves.s4_1|f1}}\% to {{shares.halves.s4_2|f1}}\% ($p$ {{shares.halves.p4|p3}}; trend in the annual share {{shares.halves.trend4.per_dec|sf1}} percentage points a decade, 95\% interval {{shares.halves.trend4.lo|sf1}} to {{shares.halves.trend4.hi|sf1}}), and the Category 5 share from {{shares.halves.s5_1|f1}}\% to {{shares.halves.s5_2|f1}}\% ($p$ {{shares.halves.p5|p3}}). The number of Category 4+ storms a season rose by {{counts.sat_c4_trend.per_dec|f1}} a decade ({{counts.sat_c4_trend.lo|f1}} to {{counts.sat_c4_trend.hi|f1}}). The Category 3+ share changed less: {{shares.halves.s3_1|f1}}\% against {{shares.halves.s3_2|f1}}\% ($p$ = {{shares.halves.p3|f2}}; trend {{shares.halves.trend3.per_dec|sf1}}, interval {{shares.halves.trend3.lo|sf1}} to {{shares.halves.trend3.hi|sf1}}). Accumulated cyclone energy shows no clear trend ({{ace.trend.per_dec|sf1}} a decade, {{ace.trend.lo|sf1}} to {{ace.trend.hi|sf1}}).
+
+By basin, the Category 4+ share rose clearly in the South Pacific, the western North Pacific and the South Indian Ocean, and not clearly in the North Atlantic, the eastern Pacific or the North Indian Ocean. Two cautions apply. Most of the global rise happened between the 1980s and the 1990s, the period in which satellite intensity methods were maturing, so part of it may be measurement. And the North Atlantic's long record (a Category 3+ share of {{shares.na_long.s3_1851_1900|f1}}\% in 1851 to 1900 against {{shares.na_long.s3_1976_2025|f1}}\% in 1976 to 2025) is not a fair comparison, because many storms, and especially weaker ones far from land, were missed. These results are consistent in direction with the global increase in the proportion of major storms from 1979 to 2017 reported by \citet{kossin2020} and summarised by \citet{wikitc}; in this raw best-track version the signal is clear for Category 4 and above but not for Category 3 and above.
+
+\begin{figure}[tbp]\centering\includegraphics[width=\textwidth]{f_shares.png}\caption{Share of storms reaching Category 3+ and 4+ by decade, worldwide 1980 to {{meta.last|raw}} (top), and Category 4+ in four basins over their whole record (bottom). Pale bars: before 1970, or fewer than 80\% of systems with a 1-minute wind.}\label{fig:shares}\end{figure}
+
+{{TABLE_SHARES}}
+
+\subsection{The poleward shift of peak intensity}
+The average latitude at which storms reach their peak moved poleward from 1980 to {{meta.last|raw}} (Figure~\ref{fig:lmi}, Table~\ref{tab:lmi}): by {{lmi.N_trend.km_per_dec|int}} km a decade in the Northern Hemisphere ({{lmi.N_trend.km_lo|int}} to {{lmi.N_trend.km_hi|int}}), {{lmi.S_trend.km_per_dec|int}} km in the Southern ({{lmi.S_trend.km_lo|int}} to {{lmi.S_trend.km_hi|int}}; OLS $p$ = {{lmi.S_trend.p|f2}}), and {{lmi.G_trend.km_per_dec|int}} km over both. The western North Pacific drives it ({{lmi.basins.WP.km_per_dec|int}} km a decade, {{lmi.basins.WP.km_lo|int}} to {{lmi.basins.WP.km_hi|int}}); the North Atlantic moved, not clearly, the other way ({{lmi.basins.NA.km_per_dec|int}} km, {{lmi.basins.NA.km_lo|int}} to {{lmi.basins.NA.km_hi|int}}). This agrees in direction with \citet{kossin2014}.
+
+\begin{figure}[tbp]\centering\includegraphics[width=\textwidth]{f_lmi.png}\caption{Left: mean absolute latitude of lifetime maximum intensity per season and hemisphere, with least-squares trends. Right: trends by hemisphere and basin, km a decade, with 95\% bootstrap intervals (pale where the interval includes zero).}\label{fig:lmi}\end{figure}
+
+{{TABLE_LMI}}
+
+\section{Limitations}
+The archive is heterogeneous: agencies, instruments and methods differ by basin and decade, and IBTrACS merges rather than homogenises them. Before about 1970 many storms are missing, especially weak, short-lived ones far from land, and outside the North Atlantic there are no winds before the 1940s or later; I therefore compare intensity only from 1980, and even then satellite methods changed. The 2025 season includes provisional tracks. Six-hourly positions and straight segments cut corners and can miss small islands; landfall winds are interpolated and often below official values. Natural Earth coastlines and boundaries are generalised. Nothing here separates natural variability (El Ni\~no, Atlantic multidecadal variability) from long-term change, and nothing here attributes trends to climate change.
+
+\section{Conclusion}
+The global record shows about {{counts.sat_ts_mean|int}} tropical storms a year since 1980 with no clear change in number, a clear rise in the share reaching Category 4 or 5, and a poleward shift in where storms peak, especially in the western Pacific. China is hit most often and the Philippines hardest. Before satellites the archive is a record of where people were watching as much as of where storms went, and it should be read that way.
+
+\section*{Data and code availability}
+The interactive map is at \url{{{meta.page}}}. Data and code are at \url{{{meta.repo}}} and archived with this paper at \url{https://doi.org/{{meta.doi}}}. Derived data are released under CC BY 4.0 and code under the MIT licence. IBTrACS is NOAA data with no copyright restrictions; please cite \citet{knapp2010} and \citet{gahtan2024}.
+
+\section*{AI statement}
+I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.
+
+\begin{thebibliography}{9}
+\bibitem[Gahtan et al.(2024)]{gahtan2024} Gahtan, J., Knapp, K. R., Schreck, C. J., Diamond, H. J., Kossin, J. P. and Kruk, M. C. (2024) International Best Track Archive for Climate Stewardship (IBTrACS) Project, Version 4r01. NOAA National Centers for Environmental Information. Retrieved 2026.
+\bibitem[Knapp et al.(2010)]{knapp2010} Knapp, K. R., Kruk, M. C., Levinson, D. H., Diamond, H. J. and Neumann, C. J. (2010) The International Best Track Archive for Climate Stewardship (IBTrACS): unifying tropical cyclone best track data. \emph{Bulletin of the American Meteorological Society} 91, 363 to 376.
+\bibitem[Kossin et al.(2014)]{kossin2014} Kossin, J. P., Emanuel, K. A. and Vecchi, G. A. (2014) The poleward migration of the location of tropical cyclone maximum intensity. \emph{Nature} 509, 349 to 352.
+\bibitem[Kossin et al.(2020)]{kossin2020} Kossin, J. P., Knapp, K. R., Olander, T. L. and Velden, C. S. (2020) Global increase in major tropical cyclone exceedance probability over the past four decades. \emph{Proceedings of the National Academy of Sciences} 117, 11975 to 11980.
+\bibitem[Natural Earth(2026)]{naturalearth} Natural Earth (2026) Admin 0 countries, admin 1 states and provinces, land. Public domain. \url{https://www.naturalearthdata.com/}
+\bibitem[Wikipedia(2026a)]{wikitc} Wikipedia contributors (2026a) Tropical cyclone. CC BY-SA 4.0. \url{https://en.wikipedia.org/wiki/Tropical_cyclone}
+\bibitem[Wikipedia(2026b)]{wikiss} Wikipedia contributors (2026b) Saffir-Simpson scale. CC BY-SA 4.0. \url{https://en.wikipedia.org/wiki/Saffir\%E2\%80\%93Simpson_scale}
+\end{thebibliography}
+\end{document}

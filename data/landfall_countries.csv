@@ -1,0 +1,95 @@
+iso,country,ts,hu,mj,c5
+CHN,China,263,102,12,0
+PHL,Philippines,225,129,67,8
+JPN,Japan,192,96,23,0
+AUS,Australia,177,60,26,1
+MEX,Mexico,158,77,21,3
+USA,United States,158,70,19,0
+VNM,Vietnam,127,33,3,0
+IND,India,92,26,12,0
+TWN,Taiwan,83,54,22,0
+MDG,Madagascar,77,37,12,0
+CUB,Cuba,37,19,11,1
+KOR,South Korea,36,13,0,0
+VUT,Vanuatu,35,15,8,2
+MOZ,Mozambique,28,19,5,0
+BGD,Bangladesh,28,11,5,0
+NCL,New Caledonia,27,12,4,0
+BHS,The Bahamas,26,15,9,2
+FJI,Fiji,23,13,6,1
+CAN,Canada,20,11,0,0
+NIC,Nicaragua,17,9,5,1
+MMR,Myanmar,16,9,4,0
+MNP,Northern Mariana Islands,15,6,3,1
+DOM,Dominican Republic,15,4,1,0
+BLZ,Belize,14,5,1,0
+NZL,New Zealand,14,0,0,0
+TON,Tonga,12,6,2,0
+PRI,Puerto Rico,10,6,3,0
+OMN,Oman,10,3,0,0
+PRK,North Korea,10,2,0,0
+GLP,Guadeloupe,9,1,1,0
+GUM,Guam,8,4,1,0
+IDN,Indonesia,8,0,0,0
+ATG,Antigua and Barbuda,7,5,3,1
+HKG,Hong Kong,7,3,0,0
+TCA,Turks and Caicos Islands,7,3,0,0
+SOM,Somalia,7,1,0,0
+JAM,Jamaica,6,3,2,1
+HTI,Haiti,6,2,1,0
+HND,Honduras,6,1,0,0
+PNG,Papua New Guinea,6,0,0,0
+TTO,Trinidad and Tobago,6,0,0,0
+FRA,France,5,3,0,0
+VGB,British Virgin Islands,5,3,1,1
+VIR,United States Virgin Islands,5,3,1,0
+SLB,Solomon Islands,5,2,0,0
+WSM,Samoa,5,2,1,0
+COL,Colombia,5,1,0,0
+RUS,Russia,5,0,0,0
+BMU,Bermuda,4,4,0,0
+MUS,Mauritius,4,3,0,0
+YEM,Yemen,4,2,1,0
+COK,Cook Islands,4,1,0,0
+LKA,Sri Lanka,4,1,0,0
+THA,Thailand,4,1,1,0
+VCT,Saint Vincent and the Grenadines,4,1,0,0
+PRT,Portugal,4,0,0,0
+VEN,Venezuela,4,0,0,0
+DMA,Dominica,3,2,1,1
+PYF,French Polynesia,3,1,1,0
+BRB,Barbados,3,0,0,0
+LCA,Saint Lucia,3,0,0,0
+MTQ,Martinique,3,0,0,0
+AIA,Anguilla,2,1,0,0
+ASM,American Samoa,2,1,0,0
+MYT,Mayotte,2,1,1,0
+CPV,Cape Verde,2,0,0,0
+GRD,Grenada,2,0,0,0
+GTM,Guatemala,2,0,0,0
+MDV,Maldives,2,0,0,0
+MHL,Marshall Islands,2,0,0,0
+MSR,Montserrat,2,0,0,0
+MYS,Malaysia,2,0,0,0
+PLW,Palau,2,0,0,0
+TZA,Tanzania,2,0,0,0
+BLM,Saint Barthélemy,1,1,0,0
+BRA,Brazil,1,1,0,0
+CYM,Cayman Islands,1,1,0,0
+KNA,Saint Kitts and Nevis,1,1,1,0
+MAF,Saint Martin,1,1,0,0
+SCR,Scarborough Shoal,1,1,0,0
+SXM,Sint Maarten,1,1,1,1
+ATF,French Southern and Antarctic Lands,1,0,0,0
+COM,Comoros,1,0,0,0
+CUW,Curaçao,1,0,0,0
+FSM,Micronesia,1,0,0,0
+NIU,Niue,1,0,0,0
+NLD,Netherlands,1,0,0,0
+PAK,Pakistan,1,0,0,0
+PGA,Wake Island,1,0,0,0
+SOL,Somaliland,1,0,0,0
+SPM,Saint Pierre and Miquelon,1,0,0,0
+SYC,Seychelles,1,0,0,0
+TUV,Tuvalu,1,0,0,0
+WLF,Wallis and Futuna,1,0,0,0
